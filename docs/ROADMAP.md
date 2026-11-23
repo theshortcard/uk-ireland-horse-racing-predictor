@@ -5,6 +5,7 @@
 - [x] CSV racecard import and validation
 - [x] Explainable baseline probabilities
 - [x] Optional raw EV calculation
+- [x] Daily report market fair probabilities, model edge and fair odds (complete books only)
 - [x] Markdown race report
 - [x] Automated tests and CI workflow across Python 3.10 and 3.12
 - [x] Race identity protection in reports and historical backtests
