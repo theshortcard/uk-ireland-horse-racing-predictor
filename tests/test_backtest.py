@@ -1,6 +1,6 @@
 import pytest
 
-from src.backtest import chronological_split, evaluate
+from src.backtest import chronological_split, evaluate, expected_calibration_error
 
 
 def test_backtest_metrics_and_flat_stake_roi():
@@ -132,3 +132,28 @@ def test_chronological_split_rejects_single_date():
 def test_chronological_split_rejects_invalid_fraction():
     with pytest.raises(ValueError, match="test_fraction"):
         chronological_split([{"date": "2026-01-01"}, {"date": "2026-01-02"}], 1.0)
+
+
+def test_expected_calibration_error_is_zero_for_perfect_predictions():
+    assert expected_calibration_error([0.05, 0.95], [0.0, 1.0]) == pytest.approx(0.05)
+
+
+def test_expected_calibration_error_handles_probability_one():
+    assert expected_calibration_error([1.0], [1.0]) == pytest.approx(0.0)
+
+
+def test_expected_calibration_error_rejects_invalid_probabilities():
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        expected_calibration_error([1.1], [1.0])
+
+
+def test_backtest_returns_model_and_market_calibration_metrics():
+    rows = [
+        {"race_id": "CAL1", "horse": "Favourite", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "2.0", "finish_position": "1"},
+        {"race_id": "CAL1", "horse": "Outsider", "horse_age": "5", "official_rating": "90",
+         "odds_decimal": "4.0", "finish_position": "2"},
+    ]
+    result = evaluate(rows)
+    assert result["model_calibration_ece"] is not None
+    assert result["market_calibration_ece"] is not None
