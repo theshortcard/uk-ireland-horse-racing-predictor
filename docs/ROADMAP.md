@@ -15,7 +15,7 @@
 - [x] Historical backtest framework
 - [x] Top-pick hit rate, multiclass Brier score and log loss
 - [x] Flat-stake ROI where valid pre-race prices are supplied
-- [ ] Add dead-heat, void-race and non-runner settlement rules
+- [x] Add dead-heat, void-race and non-runner settlement rules
 - [ ] Add time-based train/test split and benchmark comparisons
 
 ## Phase 3 — data
