@@ -99,3 +99,10 @@ No paid API or monthly subscription is assumed. User-supplied CSV files are supp
 ## Roadmap
 
 See [development roadmap](docs/ROADMAP.md) for the remaining work: permitted free data sources, historical results, settlement handling, leakage-safe backtesting, improved features, and daily automation.
+
+
+### The Racing API free racecard connection
+
+The repository includes a guarded, manual-only connector for The Racing API's free `/v1/racecards/free` endpoint. It uses HTTP Basic Authentication from the GitHub Actions secrets `RACING_API_USERNAME` and `RACING_API_PASSWORD`, requests GB and IRE regions, and fetches only one selected day (today or tomorrow) per run. The free endpoint is basic racecard data and does not supply runner odds; it must not be used for market edge or EV calculations.
+
+To test it, open **Actions → The Racing API free racecard test → Run workflow**, choose today or tomorrow, and run. The workflow uploads the raw JSON snapshot and a credential-free metadata file as a private workflow artifact with a one-day retention period. The snapshot is ignored by Git and is not imported into the model. Inspect the artifact before any mapping is written. The endpoint is limited to one request per second on the Free plan; run only one workflow at a time. Long-term retention or historical model-training use remains subject to written confirmation from the provider.
