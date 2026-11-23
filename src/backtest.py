@@ -27,6 +27,23 @@ def _is_non_runner(row: dict[str, str]) -> bool:
     return status in {"NR", "NON_RUNNER", "WITHDRAWN", "SCRATCHED"}
 
 
+def chronological_split(
+    rows: list[dict[str, str]], test_fraction: float = 0.2
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    """Split by whole race dates, keeping the newest dates for holdout evaluation."""
+    if not 0.0 < test_fraction < 1.0:
+        raise ValueError("test_fraction must be greater than 0 and less than 1.")
+    dates = sorted({(row.get("date") or "").strip() for row in rows if (row.get("date") or "").strip()})
+    if len(dates) < 2:
+        raise ValueError("A chronological holdout requires at least two distinct race dates.")
+    split_at = max(1, min(len(dates) - 1, int(len(dates) * (1.0 - test_fraction))))
+    training_dates = set(dates[:split_at])
+    holdout_dates = set(dates[split_at:])
+    training_rows = [row for row in rows if (row.get("date") or "").strip() in training_dates]
+    holdout_rows = [row for row in rows if (row.get("date") or "").strip() in holdout_dates]
+    return training_rows, holdout_rows
+
+
 def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
     """Evaluate completed races, including dead-heat win settlement."""
     groups: dict[tuple[str, str, str, str, str], list[dict[str, str]]] = defaultdict(list)
@@ -187,6 +204,15 @@ def main() -> int:
     if issues:
         raise SystemExit("Input validation failed:\\n- " + "\\n- ".join(issues))
     metrics = evaluate(rows)
+    temporal_metrics = None
+    training_rows: list[dict[str, str]] = []
+    holdout_rows: list[dict[str, str]] = []
+    try:
+        training_rows, holdout_rows = chronological_split(rows)
+        temporal_metrics = evaluate(holdout_rows)
+    except ValueError:
+        # Small or incomplete datasets may not yet support a valid chronological holdout.
+        temporal_metrics = None
 
     lines = [
         "# Historical Backtest",
@@ -223,6 +249,30 @@ def main() -> int:
         "- Do not use closing odds or post-race fields as model inputs.",
         "",
     ]
+    if temporal_metrics is not None:
+        training_dates = sorted({row.get("date", "") for row in training_rows})
+        holdout_dates = sorted({row.get("date", "") for row in holdout_rows})
+        lines.extend([
+            "## Chronological holdout (newest dates)",
+            "",
+            "> This evaluates the fixed baseline on later dates; it does not train or fit a model.",
+            "",
+            f"- Earlier-period rows: {len(training_rows)}",
+            f"- Holdout rows: {len(holdout_rows)}",
+            f"- Holdout date range: {holdout_dates[0]} to {holdout_dates[-1]}",
+            f"- Holdout races evaluated: {temporal_metrics['races_evaluated']}",
+            f"- Holdout top-pick win rate: {float(temporal_metrics['top_pick_win_rate']) * 100:.1f}%",
+            f"- Holdout Brier score: {float(temporal_metrics['mean_multiclass_brier']):.5f}",
+            f"- Holdout log loss: {float(temporal_metrics['mean_log_loss']):.5f}",
+            "",
+        ])
+    else:
+        lines.extend([
+            "## Chronological holdout",
+            "",
+            "- Not available: at least two distinct race dates and evaluable later-period races are required.",
+            "",
+        ])
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text("\\n".join(lines), encoding="utf-8")
