@@ -197,7 +197,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Evaluate the baseline on historical racecard data.")
     parser.add_argument("--input", required=True, help="Historical CSV with pre-race features and finish_position")
     parser.add_argument("--output", default="reports/backtest.md", help="Markdown report output")
+    parser.add_argument("--test-fraction", type=float, default=0.2, help="Share of newest distinct race dates reserved for holdout (default: 0.2)")
     args = parser.parse_args()
+    if not 0.0 < args.test_fraction < 1.0:
+        parser.error("--test-fraction must be greater than 0 and less than 1")
 
     rows = read_racecard(args.input)
     issues = validate_racecard(rows)
@@ -208,7 +211,7 @@ def main() -> int:
     training_rows: list[dict[str, str]] = []
     holdout_rows: list[dict[str, str]] = []
     try:
-        training_rows, holdout_rows = chronological_split(rows)
+        training_rows, holdout_rows = chronological_split(rows, args.test_fraction)
         temporal_metrics = evaluate(holdout_rows)
     except ValueError:
         # Small or incomplete datasets may not yet support a valid chronological holdout.
@@ -250,7 +253,6 @@ def main() -> int:
         "",
     ]
     if temporal_metrics is not None:
-        training_dates = sorted({row.get("date", "") for row in training_rows})
         holdout_dates = sorted({row.get("date", "") for row in holdout_rows})
         lines.extend([
             "## Chronological holdout (newest dates)",
