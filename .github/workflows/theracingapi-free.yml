@@ -1,0 +1,35 @@
+name: The Racing API free racecard test
+
+on:
+  workflow_dispatch:
+    inputs:
+      day:
+        description: Racecard date to fetch
+        required: true
+        type: choice
+        options:
+          - today
+          - tomorrow
+        default: today
+
+jobs:
+  fetch-free-racecard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Fetch one free-tier racecard snapshot
+        env:
+          RACING_API_USERNAME: ${{ secrets.RACING_API_USERNAME }}
+          RACING_API_PASSWORD: ${{ secrets.RACING_API_PASSWORD }}
+        run: |
+          python -m src.fetch_racecards_api --day "${{ inputs.day }}" --output-dir data/external/theracingapi
+      - name: Upload temporary snapshot for schema inspection
+        uses: actions/upload-artifact@v6
+        with:
+          name: theracingapi-free-racecard-${{ inputs.day }}
+          path: data/external/theracingapi/*
+          if-no-files-found: error
+          retention-days: 1
