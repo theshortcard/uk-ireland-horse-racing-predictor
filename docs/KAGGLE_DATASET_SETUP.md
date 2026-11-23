@@ -64,6 +64,6 @@ The importer:
 - sets `result_status=UNVERIFIED` and leaves result source/verification fields blank;
 - writes only to the requested staging path (the default location is ignored by Git).
 
-Course allowlists are deliberately conservative and incomplete. A course excluded by the importer may still be a valid GB or Irish venue; review the excluded-course counts and extend the allowlists only after checking each venue. The importer does not resolve duplicate runners, verify finishing positions, prove source rights, or make results official. It also does not calculate ROI. Do not change UNVERIFIED to COMPLETED or supply odds fields unless the relevant source and permissions have been independently established.
+Course allowlists are deliberately conservative and incomplete. A course excluded by the importer may still be a valid GB or Irish venue; review the excluded-course counts and extend the allowlists only after checking each venue. The importer does not resolve duplicate runners, verify finishing positions, prove source rights, or make results official. Withdrawn/non-runner (`NR`, `WD`) and void-coded rows are not labelled as losers by the preparation step; they are quarantined for review. It also does not calculate ROI. Do not change UNVERIFIED to COMPLETED or supply odds fields unless the relevant source and permissions have been independently established.
 
 The raw archive is not uploaded to this repository by this tool. Keep downloaded data outside GitHub and comply with the dataset licence and upstream source terms.
