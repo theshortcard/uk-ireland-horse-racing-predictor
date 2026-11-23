@@ -49,3 +49,30 @@ Terms: https://irishhorseracing.com/terms
 ## Required future data fields
 
 At minimum, a useful training record needs a stable race ID, runner ID/name, country, race date/time, course, race conditions, pre-race features, non-runner status, official finishing position, and (for ROI evaluation) a decimal price with source and timestamp captured before the off.
+
+
+### Community UK/Ireland historical archive — Kaggle candidate, not yet approved
+
+- A community dataset titled "Horse Racing results - UK/Ireland 1988-2026" is listed as covering results from 1988 onward and was updated to 20 November 2026.
+- The listing reports a download size of approximately 1.34 GB and the licence as Community Data License Agreement — Sharing — Version 1.0 (CDLA-Sharing-1.0).
+- The licence permits computational use. If we publish the received data or enhanced data, we must publish it under the unmodified same agreement, preserve available provider attribution, mark changes, and not add restrictions. The licence does not restrict publication of computational results.
+- The listing alone does not establish the original source and provenance of every historical record, nor prove that every field is accurate or consistently defined. We must inspect the dataset's own documentation, field definitions, source acknowledgements and sample records before accepting it.
+- The archive is too large to commit to this Git repository. If approved, it should remain a local/external data asset; only import scripts, schema documentation and non-sensitive aggregate evaluation outputs belong in Git.
+- Status: promising research candidate; not downloaded, verified, or integrated. No training or betting claims are based on it.
+
+Dataset listing: https://www.kaggle.com/datasets/deltaromeo/horse-racing-results-ukireland-2015-2025
+
+Licence text: https://cdla.dev/sharing-1-0/
+
+### Kickthebookies open racing angles — aggregate benchmark only
+
+- The publisher offers downloadable CSV and JSON aggregate statistics under CC BY 4.0, with attribution and a link to the source required.
+- Its published archive covers completed GB and Irish races since 2 January 2005, but its open-data tables contain angle/segment aggregates (runs, wins, places and fair A/E), not individual race or runner rows.
+- This is suitable for contextual market/racing-angle benchmarking and checking broad historical patterns. It is not a substitute for runner-level features, individual results, racecards or pre-off odds, and cannot train the horse-level model.
+- Do not infer individual outcomes from the aggregate rows.
+
+Open data and attribution: https://kickthebookies.com/open-data/
+
+### Licensing interpretation and integration gate
+
+A dataset being downloadable without payment is not the same as being unrestricted. Before integration, confirm the exact dataset version, licence attached to that version, source acknowledgements, field definitions, and whether any upstream restrictions are disclosed. Do not redistribute raw or enhanced CDLA-Sharing data unless the project can comply with the same licence and attribution conditions. Model-derived computational results are treated separately under the CDLA terms.
