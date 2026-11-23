@@ -122,7 +122,7 @@ def main() -> int:
         report = audit_file(source)
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(json.dumps(report, indent=2) + "\\n", encoding="utf-8")
+        output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     except (OSError, csv.Error, ValueError) as exc:
         parser.error(str(exc))
     print("Race-level integrity audit (diagnostic only; results remain UNVERIFIED):")
