@@ -78,3 +78,18 @@ def test_same_horse_twice_in_same_full_race_identity_is_flagged():
     duplicate = dict(first)
     issues = validate_racecard([first, duplicate])
     assert any("duplicate" in issue.lower() for issue in issues)
+
+
+def test_complete_market_probabilities_are_normalized():
+    result = predict_race(RUNNERS)
+    assert all(row["market_probability"] is not None for row in result)
+    assert abs(sum(row["market_probability"] for row in result) - 1.0) < 1e-6
+    assert all(row["probability_edge"] is not None for row in result)
+    assert all(row["fair_odds"] > 1.0 for row in result)
+
+
+def test_incomplete_market_does_not_publish_normalized_probabilities():
+    rows = [dict(RUNNERS[0]), dict(RUNNERS[1], odds_decimal="")]
+    result = predict_race(rows)
+    assert all(row["market_probability"] is None for row in result)
+    assert all(row["probability_edge"] is None for row in result)
