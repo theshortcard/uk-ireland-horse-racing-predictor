@@ -91,6 +91,7 @@ def convert_row(row: dict[str, str], source_file: str) -> dict[str, str] | None:
         return None
 
     raw_pos = clean(row.get("pos"))
+    finish_code = raw_pos.upper()
     numeric_position = raw_pos if re.fullmatch(r"\d+(?:\.0)?", raw_pos) else ""
     # SP is preserved only as source context. It is never a decimal price.
     return {
@@ -109,7 +110,7 @@ def convert_row(row: dict[str, str], source_file: str) -> dict[str, str] | None:
         "source_name": SOURCE_NAME,
         "retrieved_at": "",
         "finish_position": numeric_position,
-        "runner_status": "RUNNER",
+        "runner_status": "NON_RUNNER" if finish_code in {"NR", "WD"} else "RUNNER",
         "result_status": "UNVERIFIED",
         "result_source": "",
         "result_verified_at": "",
