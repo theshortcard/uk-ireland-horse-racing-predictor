@@ -6,7 +6,8 @@
 - [x] Explainable baseline probabilities
 - [x] Optional raw EV calculation
 - [x] Markdown race report
-- [x] Automated tests and CI workflow
+- [x] Automated tests and CI workflow across Python 3.10 and 3.12
+- [x] Race identity protection in reports and historical backtests
 - [x] Blank racecard and historical CSV templates
 - [x] Data dictionary and source/timestamp recording guide
 
