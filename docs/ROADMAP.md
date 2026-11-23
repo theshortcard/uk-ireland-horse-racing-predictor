@@ -4,25 +4,33 @@
 - [x] Repository and project structure
 - [x] CSV racecard import and validation
 - [x] Explainable baseline probabilities
-- [x] Optional decimal-odds EV calculation
-- [x] Markdown report
+- [x] Optional raw EV calculation
+- [x] Markdown race report
 - [x] Automated tests and CI workflow
 
-## Phase 2 — data
-- [ ] Verify free, permitted UK racecard source(s)
-- [ ] Verify free, permitted Irish racecard source(s)
+## Phase 2 — evaluation
+- [x] Historical backtest framework
+- [x] Top-pick hit rate, multiclass Brier score and log loss
+- [x] Flat-stake ROI where valid pre-race prices are supplied
+- [ ] Add dead-heat, void-race and non-runner settlement rules
+- [ ] Add time-based train/test split and benchmark comparisons
+
+## Phase 3 — data
+- [x] Review candidate free sources and document licence/coverage constraints
+- [ ] Secure a permitted UK racecard and results feed
+- [ ] Secure a permitted Irish racecard and results feed
 - [ ] Add source metadata and collection timestamps
 - [ ] Add non-runner and late-change handling
-- [ ] Add result ingestion and historical archive
+- [ ] Build a prospective historical archive
 
-## Phase 3 — modelling
+## Phase 4 — modelling
 - [ ] Build leakage-safe historical dataset
 - [ ] Establish market and rating baselines
 - [ ] Add course, distance, going, class, trainer, and jockey features when data supports them
-- [ ] Evaluate log loss, Brier score, calibration, and ROI
-- [ ] Only promote models that outperform baselines out of sample
+- [ ] Evaluate log loss, Brier score, calibration, and ROI out of sample
+- [ ] Only promote models that outperform baselines
 
-## Phase 4 — daily operation
+## Phase 5 — daily operation
 - [ ] Automated daily racecard refresh
 - [ ] Daily UK and Ireland report
 - [ ] Odds timestamp and price movement tracking
