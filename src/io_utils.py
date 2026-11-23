@@ -69,7 +69,7 @@ def validate_racecard(rows: list[dict[str, str]]) -> list[str]:
             if not valid_time:
                 issues.append(f"Line {line}: off_time must use HH:MM or HH:MM:SS.")
 
-        for field in ("horse_age", "official_rating", "odds_decimal"):
+        for field in ("horse_age", "official_rating", "days_since_run", "odds_decimal"):
             value = (row.get(field) or "").strip()
             if not value:
                 continue
@@ -87,4 +87,6 @@ def validate_racecard(rows: list[dict[str, str]]) -> list[str]:
                 issues.append(f"Line {line}: horse_age must be positive.")
             if field == "official_rating" and number < 0:
                 issues.append(f"Line {line}: official_rating cannot be negative.")
+            if field == "days_since_run" and number < 0:
+                issues.append(f"Line {line}: days_since_run cannot be negative.")
     return issues
