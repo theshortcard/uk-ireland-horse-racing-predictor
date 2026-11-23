@@ -37,9 +37,10 @@ def audit_csv(path):
     counts = Counter()
     courses = Counter()
     country_courses = Counter()
-    dates = []
-    race_keys = set()
-    duplicate_runners = 0
+    min_date = None
+    max_date = None
+    race_transitions = 0
+    previous_race_key = None
     repeated_headers = 0
     invalid_dates = 0
     samples = []
@@ -59,7 +60,8 @@ def audit_csv(path):
             counts["data_rows"] += 1
             date = parse_date(row.get("date"))
             if date:
-                dates.append(date)
+                min_date = date if min_date is None else min(min_date, date)
+                max_date = date if max_date is None else max(max_date, date)
             else:
                 invalid_dates += 1
             course = clean(row.get("course"))
@@ -75,15 +77,9 @@ def audit_csv(path):
             race_id = clean(row.get("race_id"))
             if race_id and date and course and clean(row.get("off")):
                 race_key = (date, course.casefold(), clean(row.get("off")), race_id)
-                race_keys.add(race_key)
-            horse = clean(row.get("horse"))
-            if horse and date and course and race_id:
-                # Count duplicates of identical horse entries within a date/course/race.
-                runner_key = (date, course.casefold(), race_id, horse.casefold())
-                if runner_key in seen_runners:
-                    duplicate_runners += 1
-                else:
-                    seen_runners.add(runner_key)
+                if race_key != previous_race_key:
+                    race_transitions += 1
+                    previous_race_key = race_key
             sp = clean(row.get("sp"))
             if sp:
                 counts["sp_present"] += 1
@@ -107,8 +103,8 @@ def audit_csv(path):
     # Use a local set scoped to this CSV, initialized lazily for duplicate detection.
     print("Rows:", json.dumps(dict(counts), sort_keys=True), flush=True)
     print("Repeated header rows skipped:", repeated_headers, "| invalid/unparsed dates:", invalid_dates, flush=True)
-    print("Date range:", (min(dates), max(dates)) if dates else "none", flush=True)
-    print("Distinct race keys (date/course/off/race_id):", len(race_keys), "| duplicate runner keys:", duplicate_runners, flush=True)
+    print("Date range:", (min_date, max_date) if min_date else "none", flush=True)
+    print("Race-group transitions (approximate; assumes rows are grouped by race):", race_transitions, flush=True)
     print("Course rows by provisional classification:", json.dumps(dict(country_courses), sort_keys=True), flush=True)
     print("Most common courses:", json.dumps(courses.most_common(30), ensure_ascii=False), flush=True)
     print("Example records:", json.dumps(samples, ensure_ascii=False), flush=True)
@@ -144,8 +140,6 @@ def main():
     print("AUDIT LIMITATIONS: course-based Ireland identification uses a conservative explicit course-name allowlist; unlisted courses are not automatically confirmed as GB.", flush=True)
     for path in sorted(ROOT.rglob("*.csv")):
         if path.is_file():
-            global seen_runners
-            seen_runners = set()
             audit_csv(path)
     for path in sorted(ROOT.rglob("*.db")) + sorted(ROOT.rglob("*.sqlite")) + sorted(ROOT.rglob("*.sqlite3")):
         if path.is_file():
