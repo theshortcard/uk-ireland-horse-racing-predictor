@@ -41,3 +41,8 @@ Do not enter a guessed timestamp. If a source does not provide a field, leave it
 ## Current model limitation
 
 The baseline uses official rating, days since run, and age as simple ranking signals. It is not trained on the supplied sample and has no proven predictive edge. More fields should only be added to the model after sufficient lawful historical data is available and tested out of sample.
+
+
+## Market comparison in the daily report
+
+When every runner in a race has a valid decimal price, the report normalizes the implied probabilities to remove the displayed overround and shows a market-fair probability for each runner. The model edge is the model probability minus this normalized market probability, shown in percentage points. Model fair odds are the inverse of the model probability. If any runner lacks a valid price, market-fair probabilities and edges are withheld for the entire race. These are comparison diagnostics, not proof of value or betting recommendations.
