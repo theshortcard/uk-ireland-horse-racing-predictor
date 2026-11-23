@@ -6,10 +6,18 @@ from pathlib import Path
 from .model import predict_race
 
 
+def _race_key(row: dict[str, str]) -> tuple[str, str, str, str, str]:
+    """Avoid combining separate races when a source reuses its race ID."""
+    return tuple(
+        (row.get(field) or "").strip().casefold()
+        for field in ("date", "course", "off_time", "country", "race_id")
+    )
+
+
 def build_report(rows: list[dict[str, str]], issues: list[str]) -> str:
-    groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    groups: dict[tuple[str, str, str, str, str], list[dict[str, str]]] = defaultdict(list)
     for row in rows:
-        groups[row.get("race_id", "UNKNOWN")].append(row)
+        groups[_race_key(row)].append(row)
 
     lines = [
         "# UK & Ireland Horse Racing — Daily Model Report",
@@ -28,11 +36,12 @@ def build_report(rows: list[dict[str, str]], issues: list[str]) -> str:
         lines.append("- No structural validation issues found.")
     lines.extend(["", "## Race predictions", ""])
 
-    for race_id, runners in sorted(groups.items()):
+    for race_key, runners in sorted(groups.items()):
         first = runners[0]
+        race_id = first.get("race_id", "UNKNOWN")
         lines.append(f"### {race_id} — {first.get('course', 'Unknown course')} ({first.get('date', 'date unknown')} {first.get('off_time', '')})")
         lines.append("")
-        lines.append("| Rank | Horse | Model win % | Odds | EV % |")
+        lines.append("| Rank | Horse | Model win % | Odds | Raw EV % |")
         lines.append("|---:|---|---:|---:|---:|")
         for rank, item in enumerate(predict_race(runners), start=1):
             odds = item.get("odds_decimal")
@@ -46,8 +55,8 @@ def build_report(rows: list[dict[str, str]], issues: list[str]) -> str:
         "## Interpretation",
         "",
         "- The model currently uses a simple rating-led heuristic with small age/recency adjustments.",
-        "- EV is shown only when decimal odds are supplied; it is a raw estimate and does not remove bookmaker margin.",
-        "- Do not treat positive EV as a bet recommendation until the model is backtested and calibrated on suitable historical data.",
+        "- Raw EV is shown only when decimal odds are supplied; it does not remove bookmaker margin or account for price freshness.",
+        "- Do not treat positive raw EV as a bet recommendation until the model is backtested and calibrated on suitable historical data.",
         "- Example rows are fictional and must never be mistaken for real race information.",
         "",
     ])
