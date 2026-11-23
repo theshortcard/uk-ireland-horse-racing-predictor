@@ -8,6 +8,7 @@ The first working baseline is in the repository:
 - CSV racecard import and data-quality validation
 - Explainable rating-led win probability estimates
 - Optional raw EV calculation when decimal odds are supplied
+- Normalized market fair probabilities, model-vs-market probability edge and model fair odds when the full field is priced
 - Markdown race report and historical backtest
 - Blank CSV templates with source and timestamp fields
 - Automated pytest checks and GitHub Actions workflow
@@ -53,7 +54,7 @@ See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/t
 
 - Never invent racecards, runners, non-runners, results, odds, or prices.
 - Clearly label missing, stale, estimated, or unverified information.
-- EV is a raw estimate and does not remove bookmaker margin.
+- EV is a raw estimate and does not remove bookmaker margin. Market fair probabilities require valid prices for every runner.
 - Do not treat positive EV as a betting recommendation until the model is calibrated and tested out of sample.
 - Keep historical evaluation separate from live predictions to prevent data leakage.
 - Use only data whose terms permit the intended collection, storage, and model-development use.
