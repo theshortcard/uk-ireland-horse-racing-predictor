@@ -25,9 +25,10 @@ python -m pytest -q
 python -m src.run --input data/sample_racecard.csv --output reports/daily_report.md
 python -m src.backtest --input data/sample_historical.csv --output reports/backtest.md
 python -m src.provenance --input path/to/your_racecard.csv
+python -m src.manifest --input data/source_manifest.json
 ```
 
-The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. Run `src.provenance` on your own CSV to check source fields, timestamp offsets, result verification and whether odds were captured before the scheduled off.
+The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. Run `src.provenance` on your own CSV to check source fields, timestamp offsets, result verification and whether odds were captured before the scheduled off. Copy `data/source_manifest.template.json` to `data/source_manifest.json`, fill in the exact source and licence details, and run `src.manifest` to validate the metadata and verify the dataset SHA-256 checksum.
 
 ## Use your own data
 
