@@ -28,7 +28,7 @@ def read_racecard(path: str | Path) -> list[dict[str, str]]:
 def validate_racecard(rows: list[dict[str, str]]) -> list[str]:
     """Return human-readable data-quality issues; an empty list means valid."""
     issues: list[str] = []
-    seen: set[tuple[str, str]] = set()
+    seen: set[tuple[str, str, str, str, str, str]] = set()
     if not rows:
         return ["No runners found in the racecard."]
 
@@ -39,7 +39,7 @@ def validate_racecard(rows: list[dict[str, str]]) -> list[str]:
 
         race_id = (row.get("race_id") or "").strip()
         horse = (row.get("horse") or "").strip()
-        key = (race_id, horse.casefold())
+        key = tuple((row.get(field) or "").strip().casefold() for field in ("date", "course", "off_time", "country", "race_id")) + (horse.casefold(),)
         if race_id and horse and key in seen:
             issues.append(f"Line {line}: duplicate horse '{horse}' in race '{race_id}'.")
         if race_id and horse:
