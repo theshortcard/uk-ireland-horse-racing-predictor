@@ -22,7 +22,7 @@ REQUIRED = {
 }
 NON_FINISH_CODES = {
     "PU", "UR", "F", "BD", "RO", "SU", "REF", "DSQ", "CO", "L",
-    "RR", "VOID", "NR", "B", "U", "S", "LFT",
+    "RR", "B", "U", "S", "LFT",
 }
 OUTPUT_EXTRA = ["preparation_decision", "preparation_reasons", "research_win_outcome"]
 
@@ -42,6 +42,8 @@ def finish_outcome(row: dict[str, str]) -> tuple[str, str]:
         except ValueError:
             pass
         return "invalid", ""
+    if code in {"NR", "WD", "VOID"}:
+        return "excluded", ""
     if code in NON_FINISH_CODES:
         return "known", "0"
     if not code or code == "-":
@@ -102,7 +104,9 @@ def prepare_file(input_path: Path, prepared_path: Path, quarantine_path: Path) -
                         reasons.append("invalid_off_time")
 
                     outcome_status, outcome = finish_outcome(row)
-                    if outcome_status == "missing":
+                    if outcome_status == "excluded":
+                        reasons.append("non_runner_or_void_result")
+                    elif outcome_status == "missing":
                         reasons.append("missing_finish_outcome")
                     elif outcome_status == "invalid":
                         reasons.append("invalid_finish_position")
