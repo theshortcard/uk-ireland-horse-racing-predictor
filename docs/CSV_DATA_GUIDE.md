@@ -49,3 +49,16 @@ When every runner in a race has a valid decimal price, the report normalizes the
 
 
 The historical report includes expected calibration error (ECE) using ten equal-width probability bins for both the model and, where complete prices exist, the normalized market benchmark. Lower ECE indicates a closer match between predicted probabilities and observed win frequencies, but ECE can be unstable on small datasets and should be interpreted alongside Brier score, log loss and the chronological holdout.
+
+
+## Run the provenance audit
+
+Run this against a supplied racecard or historical CSV before using its prices or results:
+
+```bash
+python -m src.provenance --input path/to/your_file.csv
+```
+
+The audit checks that each row names its source and retrieval timestamp, that timestamps include an explicit timezone offset, and that priced runners include an odds source and capture time. It checks that odds were captured strictly before the scheduled off using the UK/Ireland race timezone (Europe/London), and that the capture time does not follow the row retrieval time. Historical rows with a finish position must include a result source and timezone-aware verification timestamp.
+
+The audit checks the supplied metadata; it cannot independently prove that a provider actually supplied the data or that its licence permits your intended use. Keep original provider records and terms alongside your CSV.
