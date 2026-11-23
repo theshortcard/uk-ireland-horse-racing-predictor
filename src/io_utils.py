@@ -69,6 +69,9 @@ def validate_racecard(rows: list[dict[str, str]]) -> list[str]:
             if not valid_time:
                 issues.append(f"Line {line}: off_time must use HH:MM or HH:MM:SS.")
 
+        for field in ("horse_age", "official_rating", "days_since_run"):
+            if not (row.get(field) or "").strip():
+                issues.append(f"Line {line}: {field} is blank; the model will use its neutral fallback.")
         for field in ("horse_age", "official_rating", "days_since_run", "odds_decimal"):
             value = (row.get(field) or "").strip()
             if not value:
