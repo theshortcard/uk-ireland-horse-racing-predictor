@@ -40,9 +40,13 @@ For an unfamiliar historical CSV, inspect its structure before mapping or import
 
 ```bash
 python -m src.inspect_dataset --input path/to/source.csv --output reports/dataset_inspection.md
+python -m src.fetch_results_api --output-dir data/external/apihorseracing
 ```
 
 This read-only utility streams the file and reports row/column counts, missing values, sample values, and likely date/country/horse/odds/result columns. It does not certify the source, licence, field meanings, or pre-race availability. Review those manually before building an import mapping.
+
+Set the environment variable `AHR_API_KEY` before running the results fetch command. It saves the provider's raw yesterday-results JSON and a SHA-256 provenance sidecar under `data/external/`, which is excluded from Git. It does not map records into the predictor or provide pre-race prices; see [data-source limitations](docs/DATA_SOURCES.md). Never commit or paste your API key.
+
 
 Required racecard columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available.
 
