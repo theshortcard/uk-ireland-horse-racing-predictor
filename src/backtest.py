@@ -92,6 +92,10 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
     market_top_hits = 0
     market_roi_profit = 0.0
     market_roi_bets = 0
+    rating_benchmark_races = 0
+    rating_benchmark_hits = 0
+    rating_benchmark_roi_profit = 0.0
+    rating_benchmark_roi_bets = 0
     model_calibration_probabilities: list[float] = []
     model_calibration_outcomes: list[float] = []
     market_calibration_probabilities: list[float] = []
@@ -147,6 +151,36 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
             brier_total += (probability - target) ** 2
             if target:
                 logloss_total += -target * math.log(max(probability, 1e-15))
+
+        # Official-rating-only benchmark: include a race only when every active
+        # runner has a finite, supplied rating. This isolates the small recency/
+        # age adjustments in the experimental model from its main rating signal.
+        rating_values: list[tuple[dict[str, object], float]] = []
+        for item in predictions:
+            try:
+                rating = float(item.get("official_rating") or "")
+            except (TypeError, ValueError):
+                rating = float("nan")
+            if not math.isfinite(rating):
+                rating_values = []
+                break
+            rating_values.append((item, rating))
+        if len(rating_values) == len(predictions) and rating_values:
+            rating_benchmark_races += 1
+            rating_pick = max(rating_values, key=lambda pair: pair[1])[0]
+            rating_pick_key = str(rating_pick.get("horse", "")).casefold()
+            rating_pick_won = rating_pick_key in winner_keys
+            if rating_pick_won:
+                rating_benchmark_hits += 1
+            try:
+                rating_odds = float(rating_pick.get("odds_decimal") or "")
+            except (TypeError, ValueError):
+                rating_odds = 0.0
+            if math.isfinite(rating_odds) and rating_odds > 1.0:
+                rating_benchmark_roi_bets += 1
+                rating_benchmark_roi_profit += (
+                    rating_odds / dead_heat_places - 1.0 if rating_pick_won else -1.0
+                )
 
         # Compare against a normalized implied-probability market baseline only
         # when every active runner has a valid decimal price.
@@ -224,6 +258,10 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
         "market_top_pick_wins": market_top_hits if market_races else None,
         "market_top_pick_win_rate": market_top_hits / market_races if market_races else None,
         "market_flat_stake_roi": market_roi_profit / market_roi_bets if market_roi_bets else None,
+        "rating_benchmark_races": rating_benchmark_races,
+        "rating_benchmark_top_pick_wins": rating_benchmark_hits,
+        "rating_benchmark_top_pick_win_rate": rating_benchmark_hits / rating_benchmark_races if rating_benchmark_races else None,
+        "rating_benchmark_flat_stake_roi": rating_benchmark_roi_profit / rating_benchmark_roi_bets if rating_benchmark_roi_bets else None,
         "model_calibration_ece": expected_calibration_error(model_calibration_probabilities, model_calibration_outcomes),
         "market_calibration_ece": expected_calibration_error(market_calibration_probabilities, market_calibration_outcomes),
     }
@@ -277,6 +315,9 @@ def main() -> int:
         f"- Market calibration ECE (10 bins): {float(metrics['market_calibration_ece']):.5f}" if metrics["market_calibration_ece"] is not None else "- Market calibration ECE: Not available",
         f"- Market favourite win rate: {float(metrics['market_top_pick_win_rate']) * 100:.1f}%" if metrics["market_top_pick_win_rate"] is not None else "- Market favourite win rate: Not available",
         f"- Market favourite flat-stake ROI: {float(metrics['market_flat_stake_roi']) * 100:.1f}%" if metrics["market_flat_stake_roi"] is not None else "- Market favourite flat-stake ROI: Not available",
+        f"- Official-rating-only benchmark races: {metrics['rating_benchmark_races']}",
+        f"- Official-rating-only top-pick win rate: {float(metrics['rating_benchmark_top_pick_win_rate']) * 100:.1f}%" if metrics["rating_benchmark_top_pick_win_rate"] is not None else "- Official-rating-only top-pick win rate: Not available (incomplete ratings)",
+        f"- Official-rating-only flat-stake ROI: {float(metrics['rating_benchmark_flat_stake_roi']) * 100:.1f}%" if metrics["rating_benchmark_flat_stake_roi"] is not None else "- Official-rating-only flat-stake ROI: Not available",
         "",
         "## Data requirements",
         "",
