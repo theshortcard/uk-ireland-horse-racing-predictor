@@ -93,3 +93,10 @@ def test_incomplete_market_does_not_publish_normalized_probabilities():
     result = predict_race(rows)
     assert all(row["market_probability"] is None for row in result)
     assert all(row["probability_edge"] is None for row in result)
+
+
+def test_missing_model_features_are_explicitly_warned():
+    row = dict(RUNNERS[0], official_rating="", days_since_run="")
+    issues = validate_racecard([row])
+    assert any("official_rating is blank" in issue for issue in issues)
+    assert any("days_since_run is blank" in issue for issue in issues)
