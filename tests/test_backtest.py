@@ -173,6 +173,9 @@ def test_official_rating_only_benchmark_is_reported():
     assert result["rating_benchmark_races"] == 1
     assert result["rating_benchmark_top_pick_wins"] == 1
     assert result["rating_benchmark_top_pick_win_rate"] == pytest.approx(1.0)
+    assert result["rating_benchmark_mean_multiclass_brier"] is not None
+    assert result["rating_benchmark_mean_log_loss"] is not None
+    assert result["rating_benchmark_calibration_ece"] is not None
     assert result["rating_benchmark_flat_stake_roi"] == pytest.approx(2.0)
 
 
@@ -186,4 +189,7 @@ def test_official_rating_benchmark_skips_races_with_missing_ratings():
     result = evaluate(rows)
     assert result["rating_benchmark_races"] == 0
     assert result["rating_benchmark_top_pick_win_rate"] is None
+    assert result["rating_benchmark_mean_multiclass_brier"] is None
+    assert result["rating_benchmark_mean_log_loss"] is None
+    assert result["rating_benchmark_calibration_ece"] is None
     assert result["rating_benchmark_flat_stake_roi"] is None
