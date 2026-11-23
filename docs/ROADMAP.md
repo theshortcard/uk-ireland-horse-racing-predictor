@@ -59,5 +59,6 @@
 
 The model must not be described as profitable or reliable until sufficient out-of-sample evidence supports that claim.
 
-- [ ] Validate The Racing API Free account, endpoint response schema, and written retention/model-training permission
+- [x] Add secure manual connector for The Racing API free UK/IRE racecards with raw-only snapshots and one-day artifact retention
+- [ ] Validate The Racing API Free endpoint response schema and obtain written retention/model-training permission
 - [ ] Determine a permitted source for timestamped pre-off bookmaker odds without exceeding the £0 monthly budget
