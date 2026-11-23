@@ -140,12 +140,14 @@ def stage_files(inputs: list[Path], output: Path) -> Counter:
                     country = classify_course(clean(row.get("course")))
                     if country is None:
                         counts["excluded_unknown_or_overseas_course"] += 1
+                        counts[f"excluded_course|{clean(row.get('course'))}"] += 1
                         continue
                     converted = convert_row(row, input_path.name)
                     if converted is None:
                         counts["excluded_invalid_or_missing_core_fields"] += 1
                         continue
                     counts[f"included_{country}_rows"] += 1
+                    counts[f"included_course|{country}|{clean(row.get('course'))}"] += 1
                     if not converted["finish_position"]:
                         counts["non_numeric_finish_codes"] += 1
                     if converted["source_sp"]:
@@ -167,7 +169,18 @@ def main() -> int:
     counts = stage_files(inputs, Path(args.output))
     print("Staging complete. These are unverified records, not approved backtest data.")
     for key, value in sorted(counts.items()):
-        print(f"{key}: {value:,}")
+        if not key.startswith(("included_course|", "excluded_course|")):
+            print(f"{key}: {value:,}")
+    included_courses = [(key.split("|", 2)[1], key.split("|", 2)[2], value)
+                        for key, value in counts.items() if key.startswith("included_course|")]
+    excluded_courses = [(key.split("|", 1)[1], value)
+                        for key, value in counts.items() if key.startswith("excluded_course|")]
+    print("Top included course names (country, course, rows):")
+    for country, course, value in sorted(included_courses, key=lambda item: item[2], reverse=True)[:30]:
+        print(f"  {country} | {course} | {value:,}")
+    print("Top excluded course names (course, rows):")
+    for course, value in sorted(excluded_courses, key=lambda item: item[1], reverse=True)[:30]:
+        print(f"  {course} | {value:,}")
     print("odds_decimal is intentionally blank; source_sp is retained separately.")
     print("result_status is UNVERIFIED; result_source and result_verified_at are intentionally blank.")
     print(f"Output: {args.output}")
