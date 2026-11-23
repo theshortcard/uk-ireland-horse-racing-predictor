@@ -1,0 +1,5 @@
+race_id,date,course,country,off_time,horse,horse_age,official_rating,draw,days_since_run,trainer,jockey,odds_decimal,finish_position
+R001,2026-12-01,Ascot,GB,13:30,Example Runner A,4,112,3,21,Example Trainer,Example Jockey,3.5,
+R001,2026-12-01,Ascot,GB,13:30,Example Runner B,6,108,7,35,Example Trainer,Example Jockey,5.0,
+R001,2026-12-01,Ascot,GB,13:30,Example Runner C,5,101,1,14,Example Trainer,Example Jockey,8.0,
+R001,2026-12-01,Ascot,GB,13:30,Example Runner D,7,96,5,60,Example Trainer,Example Jockey,12.0,
