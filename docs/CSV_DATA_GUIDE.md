@@ -34,6 +34,7 @@ Do not enter a guessed timestamp. If a source does not provide a field, leave it
 - Multiple runners with `finish_position=1` are treated as a dead heat. The backtest splits the winning return across tied winners (decimal odds divided by the number of tied winners).
 - Mark void or abandoned races with `result_status=VOID` or `ABANDONED`; they are skipped. Incomplete races are also skipped and counted in the report.
 - Result status and finish position are settlement/evaluation fields only; they must never be used as pre-race model inputs.
+- The backtest also compares the model with a market baseline using normalized implied probabilities. This comparison is shown only for races where every active runner has a valid decimal price; record and check each price timestamp.
 - Keep source terms and permission records. Publicly viewable does not automatically mean permitted for bulk collection, storage, or model training.
 
 ## Current model limitation
