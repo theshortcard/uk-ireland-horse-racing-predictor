@@ -29,9 +29,9 @@ The report is created at `reports/daily_report.md`. To use your own racecard, ma
 python -m src.run --input path/to/your_racecard.csv --output reports/daily_report.md
 ```
 
-Required CSV columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available.
+Required CSV columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available. For historical evaluation, add a `finish_position` column and run: `python -m src.backtest --input path/to/historical.csv --output reports/backtest.md`. The historical file must contain pre-race features and prices recorded before the off; the backtest excludes races without exactly one official winner.
 
-## Integrity rules
+## Historical evaluation\n\nThe backtest reports top-pick win rate, multiclass Brier score, log loss, and flat-stake ROI when valid pre-race odds are present. It is not a guarantee of future performance. Dead heats, void races, non-runners and complex settlement cases are not yet modelled; exclude those records until explicit handling is added.\n\n## Integrity rules
 
 - Never invent racecards, runners, non-runners, results, odds, or prices.
 - Clearly label missing, stale, estimated, or unverified information.
