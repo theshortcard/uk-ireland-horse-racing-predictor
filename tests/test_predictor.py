@@ -52,3 +52,15 @@ def test_finish_position_does_not_change_prediction():
     before = dict(RUNNERS[0], finish_position="1")
     after = dict(RUNNERS[0], finish_position="8")
     assert predict_race([before])[0]["win_probability"] == predict_race([after])[0]["win_probability"]
+
+
+def test_negative_days_since_run_are_flagged():
+    rows = [dict(RUNNERS[0], days_since_run="-1")]
+    issues = validate_racecard(rows)
+    assert any("days_since_run cannot be negative" in issue for issue in issues)
+
+
+def test_non_finite_days_since_run_are_flagged():
+    rows = [dict(RUNNERS[0], days_since_run="inf")]
+    issues = validate_racecard(rows)
+    assert any("days_since_run must be a finite number" in issue for issue in issues)
