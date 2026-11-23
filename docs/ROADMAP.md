@@ -29,6 +29,10 @@
 - [x] Add low-memory, read-only inspection for unfamiliar source CSV files
 - [x] Review the Kaggle archive's importer schema without treating it as verified source data
 - [x] Assess the separate APIHorseRacing free-key limits for daily results collection
+Add this completed item under Phase 3 — data:
+
+- [x] Add optional key-based raw results snapshot capture with local-only storage and checksum metadata
+
 
 - [ ] Secure a permitted UK racecard and results feed
 - [ ] Secure a permitted Irish racecard and results feed
