@@ -33,3 +33,16 @@ def test_country_validation():
     rows = [dict(RUNNERS[0], country="FR")]
     issues = validate_racecard(rows)
     assert any("country must be GB or IRE" in issue for issue in issues)
+
+
+def test_invalid_date_and_time_are_flagged():
+    rows = [dict(RUNNERS[0], date="01-12-2026", off_time="25:61")]
+    issues = validate_racecard(rows)
+    assert any("date must use YYYY-MM-DD" in issue for issue in issues)
+    assert any("off_time must use HH:MM" in issue for issue in issues)
+
+
+def test_non_finite_odds_are_flagged():
+    rows = [dict(RUNNERS[0], odds_decimal="nan")]
+    issues = validate_racecard(rows)
+    assert any("odds_decimal must be a finite number" in issue for issue in issues)
