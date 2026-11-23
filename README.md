@@ -48,7 +48,7 @@ For historical evaluation, include `finish_position` and use only features and p
 python -m src.backtest --input path/to/historical.csv --output reports/backtest.md --test-fraction 0.2
 ```
 
-See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/timestamp recording, and rules for historical data. The backtest supports dead heats (split-stake settlement), excludes withdrawn runners, and skips void, abandoned and incomplete races. It compares the model with normalized market-implied probabilities when every active runner has a valid price, and reports a chronological holdout on the newest dates when enough historical dates are available. The holdout evaluates the fixed baseline; it does not train a model. See the [CSV data guide](docs/CSV_DATA_GUIDE.md) for result-status fields and limitations.
+See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/timestamp recording, and rules for historical data. The backtest supports dead heats (split-stake settlement), excludes withdrawn runners, and skips void, abandoned and incomplete races. It compares the model with normalized market-implied probabilities when every active runner has a valid price, and reports calibration error and a chronological holdout on the newest dates when enough historical dates are available. The holdout evaluates the fixed baseline; it does not train a model. See the [CSV data guide](docs/CSV_DATA_GUIDE.md) for result-status fields and limitations.
 
 ## Integrity rules
 
