@@ -45,62 +45,6 @@ jobs:
           echo "=== Downloaded file inventory (raw data is not uploaded or committed) ==="
           find "$RUNNER_TEMP/kaggle" -type f -printf '%P | %s bytes\n' | sort
 
-          python - "$RUNNER_TEMP/kaggle" <<'PY'
-          import csv
-          import json
-          import sqlite3
-          import sys
-          from pathlib import Path
-
-          root = Path(sys.argv[1])
-          metadata = root / "dataset-metadata.json"
-          if metadata.exists():
-              print("\n=== Kaggle dataset metadata ===")
-              try:
-                  data = json.loads(metadata.read_text(encoding="utf-8"))
-                  for key in ("title", "id", "licenses", "licensesName", "subtitle", "description"):
-                      if key in data:
-                          value = str(data[key]).replace("\n", " ")
-                          print(f"{key}: {value[:1000]}")
-              except Exception as exc:
-                  print(f"Metadata could not be parsed: {exc}")
-
-          csv_files = sorted(p for p in root.rglob("*.csv") if p.is_file())
-          print(f"\n=== CSV files found: {len(csv_files)} ===")
-          for path in csv_files:
-              print(f"\nCSV: {path.relative_to(root)} ({path.stat().st_size} bytes)")
-              try:
-                  with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as handle:
-                      sample = handle.read(8192)
-                      handle.seek(0)
-                      try:
-                          dialect = csv.Sniffer().sniff(sample, delimiters=",;|\t")
-                      except csv.Error:
-                          dialect = csv.excel
-                      reader = csv.reader(handle, dialect)
-                      header = next(reader, [])
-                      first = next(reader, [])
-                  print("HEADER:", json.dumps(header, ensure_ascii=False))
-                  print("FIRST DATA ROW:", json.dumps(first[:40], ensure_ascii=False))
-              except Exception as exc:
-                  print(f"CSV inspection failed: {type(exc).__name__}: {exc}")
-
-          db_files = sorted(p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in {".db", ".sqlite", ".sqlite3"})
-          print(f"\n=== SQLite files found: {len(db_files)} ===")
-          for path in db_files:
-              print(f"\nDATABASE: {path.relative_to(root)} ({path.stat().st_size} bytes)")
-              try:
-                  connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
-                  tables = connection.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
-                  for (table,) in tables:
-                      columns = connection.execute(f'PRAGMA table_info("{table}")').fetchall()
-                      print(f"TABLE {table}: " + ", ".join(column[1] for column in columns))
-                  connection.close()
-              except Exception as exc:
-                  print(f"Database inspection failed: {type(exc).__name__}: {exc}")
-
-          if not csv_files and not db_files:
-              print("\nWARNING: No CSV or SQLite data file was found; review the inventory above.")
-          PY
+          python scripts/audit_kaggle_archive.py "$RUNNER_TEMP/kaggle"
 
           rm -f "$HOME/.kaggle/kaggle.json"
