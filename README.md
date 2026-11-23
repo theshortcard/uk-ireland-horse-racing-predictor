@@ -30,6 +30,18 @@ python -m src.manifest --input data/source_manifest.json
 
 The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. Run `src.provenance` on your own CSV to check source fields, timestamp offsets, result verification and whether odds were captured before the scheduled off. Copy `data/source_manifest.template.json` to `data/source_manifest.json`, fill in the exact source and licence details, and run `src.manifest` to validate the metadata and verify the dataset SHA-256 checksum.
 
+## Historical archive status: rights not cleared
+
+The Kaggle community archive is currently **blocked from model use** pending
+evidence of upstream redistribution permission. Its bundled README points to a
+Sporting Life scraper, while Sporting Life's published terms prohibit data
+capture/scraping and copying or storing its data without explicit permission.
+The Kaggle CDLA-Sharing-1.0 label alone does not establish that the uploader had
+authority to license the upstream data. The archive importer and audits are
+diagnostic only; do not train, backtest, publish derived data, or make betting
+performance claims from this archive unless the rights issue is resolved.
+Details: [Kaggle archive provenance and rights review](docs/KAGGLE_DATASET_SETUP.md).
+
 ## Use your own data
 
 Start with:
