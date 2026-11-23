@@ -60,6 +60,9 @@ def test_stage_files_excludes_unknown_courses_and_keeps_only_known_venues(tmp_pa
     assert counts["included_GB_rows"] == 1
     assert counts["included_IRE_rows"] == 1
     assert counts["excluded_unknown_or_overseas_course"] == 1
+    assert counts["included_course|GB|Ascot"] == 1
+    assert counts["included_course|IRE|Dundalk (AW) (IRE)"] == 1
+    assert counts["excluded_course|Deauville (FR)"] == 1
     content = output.read_text(encoding="utf-8")
     assert ",UNVERIFIED," in content
     assert "5/1" in content
