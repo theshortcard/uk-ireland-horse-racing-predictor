@@ -21,8 +21,6 @@ Documentation: https://horseracingapi.org/
 - Its terms permit use in the user's own models and products, but prohibit redistribution of raw data as a competing feed. The provider also disclaims completeness and accuracy.
 - The endpoint documentation currently has no captured response example. We should not write an importer until a real response is inspected and the field mapping is tested.
 - Potential use: optional prospective result verification for races run yesterday, not historical model training or EV calculation. A free key requires account registration; no key is stored in this repository.
-Add this line to the APIHorseRacing.com section after the final bullet:
-
 - A guarded optional snapshot utility is now in `src/fetch_results_api.py`. It stores the raw JSON response and a separate SHA-256/retrieval-time sidecar under `data/external/`, which is excluded from Git. It never logs or stores the API key. Because the provider's endpoint page has no captured response example, the utility deliberately does not map fields or import records into training data. A real response must be reviewed before any adapter is written.
 
 Free-key limits: https://apihorseracing.com/documentation/free-key
