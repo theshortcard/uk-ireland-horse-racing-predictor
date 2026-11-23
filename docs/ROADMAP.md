@@ -17,7 +17,8 @@
 - [x] Flat-stake ROI where valid pre-race prices are supplied
 - [x] Add dead-heat, void-race and non-runner settlement rules
 - [x] Add market benchmark comparisons (normalized implied probabilities; complete-price races only)
-- [ ] Add time-based train/test split and additional benchmark comparisons
+- [x] Add chronological holdout evaluation by race date
+- [ ] Add additional benchmark comparisons
 
 ## Phase 3 — data
 - [x] Review candidate free sources and document licence/coverage constraints
