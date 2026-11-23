@@ -54,6 +54,8 @@ jobs:
             IMPORT_ARGS+=(--input "$source_csv")
           done
           python -m src.import_kaggle_results "${IMPORT_ARGS[@]}" --output "$RUNNER_TEMP/kaggle/staging.csv"
-          rm -f "$RUNNER_TEMP/kaggle/staging.csv"
+          echo "=== Diagnostic validation of staged UK/IRE records ==="
+          python -m src.validate_staged_results --input "$RUNNER_TEMP/kaggle/staging.csv" --output "$RUNNER_TEMP/kaggle/staging-audit.json"
+          rm -f "$RUNNER_TEMP/kaggle/staging.csv" "$RUNNER_TEMP/kaggle/staging-audit.json"
 
           rm -f "$HOME/.kaggle/kaggle.json"
