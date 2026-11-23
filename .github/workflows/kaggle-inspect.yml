@@ -56,6 +56,8 @@ jobs:
           python -m src.import_kaggle_results "${IMPORT_ARGS[@]}" --output "$RUNNER_TEMP/kaggle/staging.csv"
           echo "=== Diagnostic validation of staged UK/IRE records ==="
           python -m src.validate_staged_results --input "$RUNNER_TEMP/kaggle/staging.csv" --output "$RUNNER_TEMP/kaggle/staging-audit.json"
+          echo "=== Research-only preparation and quarantine counts ==="
+          python -m src.prepare_historical_data --input "$RUNNER_TEMP/kaggle/staging.csv" --prepared "$RUNNER_TEMP/kaggle/research-only.csv" --quarantine "$RUNNER_TEMP/kaggle/quarantine.csv"
           rm -f "$RUNNER_TEMP/kaggle/staging.csv" "$RUNNER_TEMP/kaggle/staging-audit.json"
 
           rm -f "$HOME/.kaggle/kaggle.json"
