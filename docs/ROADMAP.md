@@ -20,7 +20,7 @@
 - [x] Add dead-heat, void-race and non-runner settlement rules
 - [x] Add market benchmark comparisons (normalized implied probabilities; complete-price races only)
 - [x] Add chronological holdout evaluation by race date
-- [ ] Add additional benchmark comparisons
+- [x] Add official-rating-only benchmark comparison alongside the model and market favourite
 
 ## Phase 3 — data
 - [x] Review candidate free sources and document licence/coverage constraints
