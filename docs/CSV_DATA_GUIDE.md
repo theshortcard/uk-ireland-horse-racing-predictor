@@ -35,6 +35,7 @@ Do not enter a guessed timestamp. If a source does not provide a field, leave it
 - Mark void or abandoned races with `result_status=VOID` or `ABANDONED`; they are skipped. Incomplete races are also skipped and counted in the report.
 - Result status and finish position are settlement/evaluation fields only; they must never be used as pre-race model inputs.
 - The backtest also compares the model with a market baseline using normalized implied probabilities. This comparison is shown only for races where every active runner has a valid decimal price; record and check each price timestamp.
+- When at least two distinct race dates are present, the report evaluates the newest dates as a chronological holdout (20% by default). Set `--test-fraction` to change the share of newest dates. This evaluates the fixed baseline; it does not train a model.
 - Keep source terms and permission records. Publicly viewable does not automatically mean permitted for bulk collection, storage, or model training.
 
 ## Current model limitation
