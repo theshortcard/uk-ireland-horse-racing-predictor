@@ -43,6 +43,12 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
     non_runners_excluded = 0
     void_races_skipped = 0
     incomplete_races_skipped = 0
+    market_races = 0
+    market_brier_total = 0.0
+    market_logloss_total = 0.0
+    market_top_hits = 0
+    market_roi_profit = 0.0
+    market_roi_bets = 0
 
     for race_rows in groups.values():
         result_statuses = {
@@ -93,6 +99,41 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
             if target:
                 logloss_total += -target * math.log(max(probability, 1e-15))
 
+        # Compare against a normalized implied-probability market baseline only
+        # when every active runner has a valid decimal price.
+        market_prices: list[tuple[dict[str, object], float]] = []
+        for item in predictions:
+            try:
+                price = float(item.get("odds_decimal") or "")
+            except (TypeError, ValueError):
+                price = 0.0
+            if not math.isfinite(price) or price <= 1.0:
+                market_prices = []
+                break
+            market_prices.append((item, 1.0 / price))
+        if len(market_prices) == len(predictions) and market_prices:
+            market_total = sum(probability for _, probability in market_prices)
+            market_probabilities = [
+                (item, raw_probability / market_total)
+                for item, raw_probability in market_prices
+            ]
+            market_races += 1
+            for item, probability in market_probabilities:
+                target = target_by_horse[str(item.get("horse", "")).casefold()]
+                market_brier_total += (probability - target) ** 2
+                if target:
+                    market_logloss_total += -target * math.log(max(probability, 1e-15))
+            market_pick, _ = max(market_probabilities, key=lambda pair: pair[1])
+            market_pick_key = str(market_pick.get("horse", "")).casefold()
+            market_pick_won = market_pick_key in winner_keys
+            if market_pick_won:
+                market_top_hits += 1
+            market_odds = float(market_pick["odds_decimal"])
+            market_roi_bets += 1
+            market_roi_profit += (
+                market_odds / dead_heat_places - 1.0 if market_pick_won else -1.0
+            )
+
         top_pick = predictions[0]
         top_pick_key = str(top_pick.get("horse", "")).casefold()
         top_pick_won = top_pick_key in winner_keys
@@ -126,6 +167,12 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
         "non_runners_excluded": non_runners_excluded,
         "void_races_skipped": void_races_skipped,
         "incomplete_races_skipped": incomplete_races_skipped,
+        "market_benchmark_races": market_races,
+        "market_mean_multiclass_brier": market_brier_total / market_races if market_races else None,
+        "market_mean_log_loss": market_logloss_total / market_races if market_races else None,
+        "market_top_pick_wins": market_top_hits if market_races else None,
+        "market_top_pick_win_rate": market_top_hits / market_races if market_races else None,
+        "market_flat_stake_roi": market_roi_profit / market_roi_bets if market_roi_bets else None,
     }
 
 
@@ -158,6 +205,11 @@ def main() -> int:
         f"- Non-runners excluded: {metrics['non_runners_excluded']}",
         f"- Void/abandoned races skipped: {metrics['void_races_skipped']}",
         f"- Incomplete races skipped: {metrics['incomplete_races_skipped']}",
+        f"- Races with complete valid odds for market benchmark: {metrics['market_benchmark_races']}",
+        f"- Market benchmark Brier score: {float(metrics['market_mean_multiclass_brier']):.5f}" if metrics["market_mean_multiclass_brier"] is not None else "- Market benchmark Brier score: Not available",
+        f"- Market benchmark log loss: {float(metrics['market_mean_log_loss']):.5f}" if metrics["market_mean_log_loss"] is not None else "- Market benchmark log loss: Not available",
+        f"- Market favourite win rate: {float(metrics['market_top_pick_win_rate']) * 100:.1f}%" if metrics["market_top_pick_win_rate"] is not None else "- Market favourite win rate: Not available",
+        f"- Market favourite flat-stake ROI: {float(metrics['market_flat_stake_roi']) * 100:.1f}%" if metrics["market_flat_stake_roi"] is not None else "- Market favourite flat-stake ROI: Not available",
         "",
         "## Data requirements",
         "",
@@ -166,6 +218,8 @@ def main() -> int:
         "- Use runner_status=NON_RUNNER for withdrawn runners and retain their rows for audit.",
         "- Multiple finish_position=1 rows are treated as a dead heat; winning returns are divided by the number of tied winners.",
         "- Race identity uses date, course, off time, country, and race ID so reused source IDs do not merge separate races.",
+        "- Market benchmark uses normalized implied probabilities and is calculated only when every active runner has a valid decimal price.",
+        "- Record price timestamps and confirm prices were captured before the off; the backtest cannot independently verify timestamps.",
         "- Do not use closing odds or post-race fields as model inputs.",
         "",
     ]
