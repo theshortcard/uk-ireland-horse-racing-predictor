@@ -76,3 +76,17 @@ def test_stage_files_excludes_unknown_courses_and_keeps_only_known_venues(tmp_pa
     content = output.read_text(encoding="utf-8")
     assert ",UNVERIFIED," in content
     assert "5/1" in content
+
+
+
+def test_non_runner_code_is_not_marked_as_a_runner():
+    row = {
+        "date": "2026-11-20", "course": "Ascot", "race_id": "R3",
+        "off": "15:00", "horse": "Non Runner", "age": "5",
+        "or": "90", "pos": "NR", "sp": "",
+    }
+    converted = convert_row(row, "raceform.csv")
+    assert converted is not None
+    assert converted["runner_status"] == "NON_RUNNER"
+    assert converted["source_finish_code"] == "NR"
+    assert converted["finish_position"] == ""
