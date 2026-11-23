@@ -3,6 +3,8 @@ from src.import_kaggle_results import classify_course, convert_row, normalise_co
 
 def test_course_classification_is_conservative():
     assert classify_course("Dundalk (AW) (IRE)") == "IRE"
+    assert classify_course("Dundalk (AW)") == "IRE"
+    assert classify_course("Fairyhouse (IRE)") == "IRE"
     assert classify_course("Curragh (IRE)") == "IRE"
     assert classify_course("Wolverhampton (AW)") == "GB"
     assert classify_course("Deauville (FR)") is None
@@ -26,6 +28,7 @@ def test_archive_starting_price_never_becomes_decimal_odds():
     assert converted["result_status"] == "UNVERIFIED"
     assert converted["result_source"] == ""
     assert converted["result_verified_at"] == ""
+    assert converted["source_archive_file"] == "raceform.csv"
 
 
 def test_non_numeric_finish_code_is_preserved_without_fake_position():
@@ -44,10 +47,11 @@ def test_non_numeric_finish_code_is_preserved_without_fake_position():
 def test_stage_files_excludes_unknown_courses_and_keeps_only_known_venues(tmp_path):
     source = tmp_path / "source.csv"
     source.write_text(
-        "date,course,race_id,off,horse,age,or,pos,sp\n"
-        "2026-11-20,Ascot,R1,13:00,Runner A,5,100,1,2/1\n"
-        "2026-11-20,Deauville (FR),R2,13:30,Runner B,4,90,2,3/1\n"
-        "2026-11-20,Dundalk (AW) (IRE),R3,14:00,Runner C,6,80,PU,5/1\n",
+        """date,course,race_id,off,horse,age,or,pos,sp
+2026-11-20,Ascot,R1,13:00,Runner A,5,100,1,2/1
+2026-11-20,Deauville (FR),R2,13:30,Runner B,4,90,2,3/1
+2026-11-20,Dundalk (AW) (IRE),R3,14:00,Runner C,6,80,PU,5/1
+""",
         encoding="utf-8",
     )
     output = tmp_path / "staging.csv"
