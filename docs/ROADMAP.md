@@ -29,6 +29,9 @@
 - [x] Add low-memory, read-only inspection for unfamiliar source CSV files
 - [x] Review the Kaggle archive's importer schema without treating it as verified source data
 - [x] Assess the separate APIHorseRacing free-key limits for daily results collection
+- [x] Review HorseRacingAPI.org free result-only access and its no-database-rebuild restriction
+- [x] Review RacingAPI.net UK/IRE coverage and confirm its listed subscription is outside the £0 budget
+- [x] Review BHA public racing data packs; aggregate PDFs do not provide runner-level training rows
 - [x] Add optional key-based raw results snapshot capture with local-only storage and checksum metadata
 
 
