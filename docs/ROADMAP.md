@@ -26,9 +26,9 @@
 - [x] Review candidate free sources and document licence/coverage constraints
 - [x] Add dataset source manifest and SHA-256 integrity validator
 - [x] Identify a CC BY aggregate benchmark source (not runner-level training data)
-Add this completed item under Phase 3 — data:
-
 - [x] Add low-memory, read-only inspection for unfamiliar source CSV files
+- [x] Review the Kaggle archive's importer schema without treating it as verified source data
+- [x] Assess the separate APIHorseRacing free-key limits for daily results collection
 
 - [ ] Secure a permitted UK racecard and results feed
 - [ ] Secure a permitted Irish racecard and results feed
