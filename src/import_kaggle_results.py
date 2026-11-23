@@ -110,7 +110,8 @@ def convert_row(row: dict[str, str], source_file: str) -> dict[str, str] | None:
         "result_source": "",
         "result_verified_at": "",
         "source_sp": clean(row.get("sp")),
-        "source_finish_code": "" if numeric_position else raw_pos,\n        "source_archive_file": source_file,
+        "source_finish_code": "" if numeric_position else raw_pos,
+        "source_archive_file": source_file,
     }
 
 
