@@ -24,7 +24,7 @@ jobs:
       - name: Generate sample backtest
         run: python -m src.backtest --input data/sample_historical.csv --output reports/backtest.md
       - name: Upload sample reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: sample-predictor-reports
           path: |
