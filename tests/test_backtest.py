@@ -80,3 +80,32 @@ def test_void_and_incomplete_races_are_skipped():
     assert result["races_evaluated"] == 1
     assert result["void_races_skipped"] == 1
     assert result["incomplete_races_skipped"] == 1
+
+
+def test_market_benchmark_is_reported_when_all_runner_prices_exist():
+    rows = [
+        {"race_id": "M1", "horse": "Favourite", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "2.0", "finish_position": "1"},
+        {"race_id": "M1", "horse": "Outsider", "horse_age": "5", "official_rating": "90",
+         "odds_decimal": "4.0", "finish_position": "2"},
+    ]
+    result = evaluate(rows)
+    assert result["market_benchmark_races"] == 1
+    assert result["market_top_pick_wins"] == 1
+    assert result["market_mean_multiclass_brier"] is not None
+    assert result["market_mean_log_loss"] is not None
+    assert result["market_flat_stake_roi"] == pytest.approx(1.0)
+
+
+def test_market_benchmark_skips_races_with_missing_runner_prices():
+    rows = [
+        {"race_id": "M2", "horse": "Favourite", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "2.0", "finish_position": "1"},
+        {"race_id": "M2", "horse": "No Price", "horse_age": "5", "official_rating": "90",
+         "odds_decimal": "", "finish_position": "2"},
+    ]
+    result = evaluate(rows)
+    assert result["races_evaluated"] == 1
+    assert result["market_benchmark_races"] == 0
+    assert result["market_mean_multiclass_brier"] is None
+    assert result["market_flat_stake_roi"] is None
