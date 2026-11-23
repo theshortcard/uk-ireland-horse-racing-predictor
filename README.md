@@ -21,15 +21,16 @@ Requires Python 3.10 or newer.
 python -m pip install -r requirements.txt
 python -m pytest -q
 python -m src.run --input data/sample_racecard.csv --output reports/daily_report.md
+python -m src.backtest --input data/sample_historical.csv --output reports/backtest.md
 ```
 
-The report is created at `reports/daily_report.md`. To use your own racecard, make a CSV with the same columns as `data/sample_racecard.csv`, then replace the input path:
+The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. To use your own racecard, make a CSV with the same columns as `data/sample_racecard.csv`, then replace the input path:
 
 ```bash
 python -m src.run --input path/to/your_racecard.csv --output reports/daily_report.md
 ```
 
-Required CSV columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available. For historical evaluation, add a `finish_position` column and run: `python -m src.backtest --input path/to/historical.csv --output reports/backtest.md`. The historical file must contain pre-race features and prices recorded before the off; the backtest excludes races without exactly one official winner.
+Required CSV columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available. For historical evaluation, add a `finish_position` column (see the fictional example `data/sample_historical.csv`) and run: `python -m src.backtest --input path/to/historical.csv --output reports/backtest.md`. The historical file must contain pre-race features and prices recorded before the off; the backtest excludes races without exactly one official winner.
 
 ## Historical evaluation\n\nThe backtest reports top-pick win rate, multiclass Brier score, log loss, and flat-stake ROI when valid pre-race odds are present. It is not a guarantee of future performance. Dead heats, void races, non-runners and complex settlement cases are not yet modelled; exclude those records until explicit handling is added.\n\n## Integrity rules
 
