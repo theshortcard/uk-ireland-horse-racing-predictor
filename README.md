@@ -24,9 +24,10 @@ python -m pip install -r requirements.txt
 python -m pytest -q
 python -m src.run --input data/sample_racecard.csv --output reports/daily_report.md
 python -m src.backtest --input data/sample_historical.csv --output reports/backtest.md
+python -m src.provenance --input path/to/your_racecard.csv
 ```
 
-The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`.
+The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. Run `src.provenance` on your own CSV to check source fields, timestamp offsets, result verification and whether odds were captured before the scheduled off.
 
 ## Use your own data
 
