@@ -7,6 +7,8 @@
 - [x] Optional raw EV calculation
 - [x] Markdown race report
 - [x] Automated tests and CI workflow
+- [x] Blank racecard and historical CSV templates
+- [x] Data dictionary and source/timestamp recording guide
 
 ## Phase 2 — evaluation
 - [x] Historical backtest framework
@@ -19,7 +21,7 @@
 - [x] Review candidate free sources and document licence/coverage constraints
 - [ ] Secure a permitted UK racecard and results feed
 - [ ] Secure a permitted Irish racecard and results feed
-- [ ] Add source metadata and collection timestamps
+- [ ] Automate source metadata and collection timestamps
 - [ ] Add non-runner and late-change handling
 - [ ] Build a prospective historical archive
 
