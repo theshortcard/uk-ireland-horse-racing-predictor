@@ -1,0 +1,28 @@
+name: Predictor tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Run tests
+        run: python -m pytest -q
+      - name: Generate sample report
+        run: python -m src.run --input data/sample_racecard.csv --output reports/daily_report.md
+      - name: Upload sample report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sample-daily-report
+          path: reports/daily_report.md
