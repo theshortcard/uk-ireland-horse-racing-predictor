@@ -46,3 +46,6 @@ The baseline uses official rating, days since run, and age as simple ranking sig
 ## Market comparison in the daily report
 
 When every runner in a race has a valid decimal price, the report normalizes the implied probabilities to remove the displayed overround and shows a market-fair probability for each runner. The model edge is the model probability minus this normalized market probability, shown in percentage points. Model fair odds are the inverse of the model probability. If any runner lacks a valid price, market-fair probabilities and edges are withheld for the entire race. These are comparison diagnostics, not proof of value or betting recommendations.
+
+
+The historical report includes expected calibration error (ECE) using ten equal-width probability bins for both the model and, where complete prices exist, the normalized market benchmark. Lower ECE indicates a closer match between predicted probabilities and observed win frequencies, but ECE can be unstable on small datasets and should be interpreted alongside Brier score, log loss and the chronological holdout.
