@@ -27,6 +27,32 @@ def _is_non_runner(row: dict[str, str]) -> bool:
     return status in {"NR", "NON_RUNNER", "WITHDRAWN", "SCRATCHED"}
 
 
+def expected_calibration_error(
+    probabilities: list[float], outcomes: list[float], bins: int = 10
+) -> float | None:
+    """Return weighted absolute calibration gap for equal-width probability bins."""
+    if len(probabilities) != len(outcomes) or not probabilities:
+        return None
+    if bins < 1:
+        raise ValueError("bins must be at least 1.")
+    counts = [0] * bins
+    probability_sums = [0.0] * bins
+    outcome_sums = [0.0] * bins
+    for probability, outcome in zip(probabilities, outcomes):
+        if not 0.0 <= probability <= 1.0 or not 0.0 <= outcome <= 1.0:
+            raise ValueError("Probabilities and outcomes must be between 0 and 1.")
+        index = min(int(probability * bins), bins - 1)
+        counts[index] += 1
+        probability_sums[index] += probability
+        outcome_sums[index] += outcome
+    total = len(probabilities)
+    error = 0.0
+    for count, probability_sum, outcome_sum in zip(counts, probability_sums, outcome_sums):
+        if count:
+            error += count / total * abs(probability_sum / count - outcome_sum / count)
+    return error
+
+
 def chronological_split(
     rows: list[dict[str, str]], test_fraction: float = 0.2
 ) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
@@ -66,6 +92,10 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
     market_top_hits = 0
     market_roi_profit = 0.0
     market_roi_bets = 0
+    model_calibration_probabilities: list[float] = []
+    model_calibration_outcomes: list[float] = []
+    market_calibration_probabilities: list[float] = []
+    market_calibration_outcomes: list[float] = []
 
     for race_rows in groups.values():
         result_statuses = {
@@ -112,6 +142,8 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
             horse_key = str(item.get("horse", "")).casefold()
             probability = float(item["win_probability"])
             target = target_by_horse[horse_key]
+            model_calibration_probabilities.append(probability)
+            model_calibration_outcomes.append(target)
             brier_total += (probability - target) ** 2
             if target:
                 logloss_total += -target * math.log(max(probability, 1e-15))
@@ -137,6 +169,8 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
             market_races += 1
             for item, probability in market_probabilities:
                 target = target_by_horse[str(item.get("horse", "")).casefold()]
+                market_calibration_probabilities.append(probability)
+                market_calibration_outcomes.append(target)
                 market_brier_total += (probability - target) ** 2
                 if target:
                     market_logloss_total += -target * math.log(max(probability, 1e-15))
@@ -190,6 +224,8 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
         "market_top_pick_wins": market_top_hits if market_races else None,
         "market_top_pick_win_rate": market_top_hits / market_races if market_races else None,
         "market_flat_stake_roi": market_roi_profit / market_roi_bets if market_roi_bets else None,
+        "model_calibration_ece": expected_calibration_error(model_calibration_probabilities, model_calibration_outcomes),
+        "market_calibration_ece": expected_calibration_error(market_calibration_probabilities, market_calibration_outcomes),
     }
 
 
@@ -227,6 +263,7 @@ def main() -> int:
         f"- Top-pick win rate: {float(metrics['top_pick_win_rate']) * 100:.1f}%",
         f"- Mean multiclass Brier score: {float(metrics['mean_multiclass_brier']):.5f} (lower is better)",
         f"- Mean log loss: {float(metrics['mean_log_loss']):.5f} (lower is better)",
+        f"- Model calibration ECE (10 bins): {float(metrics['model_calibration_ece']):.5f}" if metrics["model_calibration_ece"] is not None else "- Model calibration ECE: Not available",
         f"- Flat-stake bets with valid pre-race odds: {metrics['flat_stake_bets_with_odds']}",
         f"- Flat-stake profit (units): {metrics['flat_stake_profit_units'] if metrics['flat_stake_profit_units'] is not None else 'Not available'}",
         f"- Flat-stake ROI: {float(metrics['flat_stake_roi']) * 100:.1f}%" if metrics['flat_stake_roi'] is not None else "- Flat-stake ROI: Not available (no valid odds)",
@@ -237,6 +274,7 @@ def main() -> int:
         f"- Races with complete valid odds for market benchmark: {metrics['market_benchmark_races']}",
         f"- Market benchmark Brier score: {float(metrics['market_mean_multiclass_brier']):.5f}" if metrics["market_mean_multiclass_brier"] is not None else "- Market benchmark Brier score: Not available",
         f"- Market benchmark log loss: {float(metrics['market_mean_log_loss']):.5f}" if metrics["market_mean_log_loss"] is not None else "- Market benchmark log loss: Not available",
+        f"- Market calibration ECE (10 bins): {float(metrics['market_calibration_ece']):.5f}" if metrics["market_calibration_ece"] is not None else "- Market calibration ECE: Not available",
         f"- Market favourite win rate: {float(metrics['market_top_pick_win_rate']) * 100:.1f}%" if metrics["market_top_pick_win_rate"] is not None else "- Market favourite win rate: Not available",
         f"- Market favourite flat-stake ROI: {float(metrics['market_flat_stake_roi']) * 100:.1f}%" if metrics["market_flat_stake_roi"] is not None else "- Market favourite flat-stake ROI: Not available",
         "",
@@ -266,6 +304,7 @@ def main() -> int:
             f"- Holdout top-pick win rate: {float(temporal_metrics['top_pick_win_rate']) * 100:.1f}%",
             f"- Holdout Brier score: {float(temporal_metrics['mean_multiclass_brier']):.5f}",
             f"- Holdout log loss: {float(temporal_metrics['mean_log_loss']):.5f}",
+            f"- Holdout model calibration ECE: {float(temporal_metrics['model_calibration_ece']):.5f}" if temporal_metrics["model_calibration_ece"] is not None else "- Holdout model calibration ECE: Not available",
             "",
         ])
     else:
