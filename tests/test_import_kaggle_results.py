@@ -7,12 +7,22 @@ def test_course_classification_is_conservative():
     assert classify_course("Fairyhouse (IRE)") == "IRE"
     assert classify_course("Curragh (IRE)") == "IRE"
     assert classify_course("Wolverhampton (AW)") == "GB"
+    assert classify_course("Carlisle") == "GB"
+    assert classify_course("Yarmouth") == "GB"
+    assert classify_course("Ffos Las") == "GB"
+    assert classify_course("Aintree") == "GB"
+    assert classify_course("Down Royal") == "IRE"
+    assert classify_course("Down Royal (IRE)") == "IRE"
+    assert classify_course("Ballinrobe") == "IRE"
+    assert classify_course("Tralee") == "IRE"
     assert classify_course("Deauville (FR)") is None
     assert classify_course("Unknown Park") is None
 
 
 def test_course_normalisation_removes_parenthetical_notes():
     assert normalise_course("Dundalk (AW) (IRE)") == "dundalk"
+    assert normalise_course("Carlisle\\u00a0") == "carlisle"
+    assert normalise_course("Carlisle\\u200b") == "carlisle"
 
 
 def test_archive_starting_price_never_becomes_decimal_odds():
