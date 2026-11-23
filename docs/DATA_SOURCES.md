@@ -60,6 +60,11 @@ At minimum, a useful training record needs a stable race ID, runner ID/name, cou
 - The archive is too large to commit to this Git repository. If approved, it should remain a local/external data asset; only import scripts, schema documentation and non-sensitive aggregate evaluation outputs belong in Git.
 - Status: promising research candidate; not downloaded, verified, or integrated. No training or betting claims are based on it.
 
+Add this paragraph immediately after the Kaggle candidate status line:
+
+A generic CSV inspection utility is now available at `src/inspect_dataset.py`. It can profile a downloaded file without importing it or loading all rows into memory. It is a structural first check only: it does not approve the Kaggle candidate, establish upstream provenance, validate the CDLA obligations, or make its fields safe for training. The archive remains unapproved until those checks are completed.
+
+
 Dataset listing: https://www.kaggle.com/datasets/deltaromeo/horse-racing-results-ukireland-2015-2025
 
 Licence text: https://cdla.dev/sharing-1-0/
