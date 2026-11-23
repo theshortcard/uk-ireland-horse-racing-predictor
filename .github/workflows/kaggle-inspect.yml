@@ -58,6 +58,8 @@ jobs:
           python -m src.validate_staged_results --input "$RUNNER_TEMP/kaggle/staging.csv" --output "$RUNNER_TEMP/kaggle/staging-audit.json"
           echo "=== Research-only preparation and quarantine counts ==="
           python -m src.prepare_historical_data --input "$RUNNER_TEMP/kaggle/staging.csv" --prepared "$RUNNER_TEMP/kaggle/research-only.csv" --quarantine "$RUNNER_TEMP/kaggle/quarantine.csv"
+          echo "=== Race-level winner integrity audit (diagnostic only) ==="
+          python -m src.audit_race_integrity --input "$RUNNER_TEMP/kaggle/research-only.csv" --output "$RUNNER_TEMP/kaggle/race-integrity-audit.json"
           rm -f "$RUNNER_TEMP/kaggle/staging.csv" "$RUNNER_TEMP/kaggle/staging-audit.json"
 
           rm -f "$HOME/.kaggle/kaggle.json"
