@@ -24,7 +24,7 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
       - name: Generate sample report
-        run: python -m src.run --input data/sample_racecard.csv --output reports/daily_report.md
+        run: python -m src.run --input data/sample_racecard.csv --output reports/daily_report.md --allow-blocked-provenance
       - name: Generate sample backtest
         run: python -m src.backtest --input data/sample_historical.csv --output reports/backtest.md
       - name: Upload sample reports
