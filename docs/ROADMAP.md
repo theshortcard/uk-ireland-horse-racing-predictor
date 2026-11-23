@@ -32,6 +32,8 @@
 - [x] Review HorseRacingAPI.org free result-only access and its no-database-rebuild restriction
 - [x] Review RacingAPI.net UK/IRE coverage and confirm its listed subscription is outside the £0 budget
 - [x] Review BHA public racing data packs; aggregate PDFs do not provide runner-level training rows
+- [x] Distinguish RacingAPI.net card-required trial from Horse Racing API UK's limited free yesterday-results key
+- [x] Review RPScrape and community fork; defer use pending explicit Racing Post permission and source-data rights
 - [x] Add optional key-based raw results snapshot capture with local-only storage and checksum metadata
 
 
