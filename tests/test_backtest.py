@@ -33,3 +33,50 @@ def test_reused_source_race_id_does_not_merge_different_dates():
     result = evaluate(rows)
     assert result["races_evaluated"] == 2
     assert result["top_pick_wins"] == 2
+
+
+def test_dead_heat_uses_fractional_probability_targets_and_split_returns():
+    rows = [
+        {"race_id": "DH1", "horse": "Tied A", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "4.0", "finish_position": "1"},
+        {"race_id": "DH1", "horse": "Tied B", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "4.0", "finish_position": "1"},
+        {"race_id": "DH1", "horse": "Third", "horse_age": "5", "official_rating": "80",
+         "odds_decimal": "8.0", "finish_position": "3"},
+    ]
+    result = evaluate(rows)
+    assert result["races_evaluated"] == 1
+    assert result["dead_heat_races"] == 1
+    assert result["top_pick_wins"] == 1
+    assert result["flat_stake_profit_units"] == pytest.approx(1.0)
+    assert result["flat_stake_roi"] == pytest.approx(1.0)
+
+
+def test_non_runner_is_excluded_from_predictions_and_roi():
+    rows = [
+        {"race_id": "NR1", "horse": "Withdrawn Favourite", "horse_age": "5", "official_rating": "130",
+         "odds_decimal": "1.5", "finish_position": "", "runner_status": "NON_RUNNER"},
+        {"race_id": "NR1", "horse": "Actual Winner", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "3.0", "finish_position": "1"},
+        {"race_id": "NR1", "horse": "Second", "horse_age": "5", "official_rating": "90",
+         "odds_decimal": "5.0", "finish_position": "2"},
+    ]
+    result = evaluate(rows)
+    assert result["non_runners_excluded"] == 1
+    assert result["top_pick_wins"] == 1
+    assert result["flat_stake_profit_units"] == pytest.approx(2.0)
+
+
+def test_void_and_incomplete_races_are_skipped():
+    rows = [
+        {"race_id": "OK", "horse": "Winner", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "2.0", "finish_position": "1"},
+        {"race_id": "VOID", "horse": "Runner", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "2.0", "finish_position": "", "result_status": "VOID"},
+        {"race_id": "INC", "horse": "Runner", "horse_age": "5", "official_rating": "100",
+         "odds_decimal": "2.0", "finish_position": "", "result_status": "INCOMPLETE"},
+    ]
+    result = evaluate(rows)
+    assert result["races_evaluated"] == 1
+    assert result["void_races_skipped"] == 1
+    assert result["incomplete_races_skipped"] == 1
