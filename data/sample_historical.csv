@@ -1,0 +1,5 @@
+race_id,date,course,country,off_time,horse,horse_age,official_rating,draw,days_since_run,trainer,jockey,odds_decimal,finish_position
+H001,2026-10-01,Example Park,GB,13:30,Example Winner One,5,112,2,21,Example Trainer A,Example Jockey A,3.0,1
+H001,2026-10-01,Example Park,GB,13:30,Example Runner Two,6,104,5,28,Example Trainer B,Example Jockey B,5.0,2
+H002,2026-10-02,Example Downs,IRE,14:00,Example Runner Three,4,108,1,14,Example Trainer C,Example Jockey C,4.0,2
+H002,2026-10-02,Example Downs,IRE,14:00,Example Winner Four,5,98,3,35,Example Trainer D,Example Jockey D,7.0,1
