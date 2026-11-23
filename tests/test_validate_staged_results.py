@@ -19,12 +19,14 @@ R1,2026-11-20,Ascot,GB,13:00,Runner A,5,100,1,UNVERIFIED,
 R1,2026-11-20,Ascot,GB,13:00,Runner B,4,,2,UNVERIFIED,
 R2,2026-11-20,Dundalk,IRE,25:00,Runner C,0,-1,,UNVERIFIED,XYZ
 R3,2026-11-20,Ascot,GB,14:00,Runner D,5,90,0,UNVERIFIED,
+R4,2026-11-20,Ascot,GB,15:00,Runner E,5,90,,UNVERIFIED,LFT
+R5,2026-11-20,Ascot,GB,16:00,Runner F,5,90,,UNVERIFIED,-
 """,
         encoding="utf-8",
     )
     report = audit_file(source)
     counts = report["counts"]
-    assert counts["rows"] == 5
+    assert counts["rows"] == 7
     assert counts["duplicate_runner_rows"] == 1
     assert counts["missing_official_rating"] == 1
     assert counts["invalid_off_time"] == 1
@@ -32,7 +34,8 @@ R3,2026-11-20,Ascot,GB,14:00,Runner D,5,90,0,UNVERIFIED,
     assert counts["invalid_official_rating"] == 1
     assert counts["invalid_finish_position"] == 1
     assert counts["unrecognised_finish_code"] == 1
-    assert counts["race_groups"] == 3
+    assert counts["missing_finish_outcome"] == 1
+    assert counts["race_groups"] == 5
     assert report["date_range"] == ["2026-11-20", "2026-11-20"]
 
 
