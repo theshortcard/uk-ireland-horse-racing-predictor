@@ -122,7 +122,7 @@ def render_markdown(summary: dict[str, object]) -> str:
         "1. Confirm the dataset version, licence, upstream source acknowledgements and permitted model-development use.",
         "2. Check whether each row represents a runner, a race, or another entity.",
         "3. Verify country codes, date/time conventions, race identifiers, non-runner codes and finishing-position meanings.",
-        "4. Confirm which ratings and prices were available before the race; do not use post-race fields as predictors.",
+        "4. Confirm which ratings and prices were available before the race. Do not use post-race fields as predictors.",
         "5. Only then write a documented field mapping into the project historical CSV format.",
         "",
     ])
