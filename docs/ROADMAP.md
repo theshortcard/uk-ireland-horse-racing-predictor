@@ -34,6 +34,7 @@
 - [x] Review BHA public racing data packs; aggregate PDFs do not provide runner-level training rows
 - [x] Distinguish RacingAPI.net card-required trial from Horse Racing API UK's limited free yesterday-results key
 - [x] Review RPScrape and community fork; defer use pending explicit Racing Post permission and source-data rights
+- [x] Review The Racing API free plan: UK/IRE basic today/tomorrow racecards and daily results; odds and several enriched endpoints require paid tiers
 - [x] Add optional key-based raw results snapshot capture with local-only storage and checksum metadata
 
 
@@ -57,3 +58,6 @@
 - [ ] Alerts for missing or stale data
 
 The model must not be described as profitable or reliable until sufficient out-of-sample evidence supports that claim.
+
+- [ ] Validate The Racing API Free account, endpoint response schema, and written retention/model-training permission
+- [ ] Determine a permitted source for timestamped pre-off bookmaker odds without exceeding the £0 monthly budget
