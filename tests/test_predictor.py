@@ -64,3 +64,17 @@ def test_non_finite_days_since_run_are_flagged():
     rows = [dict(RUNNERS[0], days_since_run="inf")]
     issues = validate_racecard(rows)
     assert any("days_since_run must be a finite number" in issue for issue in issues)
+
+
+def test_same_horse_in_different_races_is_not_flagged_as_duplicate():
+    first = dict(RUNNERS[0], race_id="123", date="2026-11-20", course="Ascot", off_time="13:00")
+    second = dict(RUNNERS[0], race_id="123", date="2026-11-21", course="Newmarket", off_time="14:00")
+    issues = validate_racecard([first, second])
+    assert not any("duplicate" in issue.lower() for issue in issues)
+
+
+def test_same_horse_twice_in_same_full_race_identity_is_flagged():
+    first = dict(RUNNERS[0], race_id="123", date="2026-11-20", course="Ascot", off_time="13:00")
+    duplicate = dict(first)
+    issues = validate_racecard([first, duplicate])
+    assert any("duplicate" in issue.lower() for issue in issues)
