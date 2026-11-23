@@ -112,10 +112,11 @@ def audit_file(input_path: Path) -> dict:
                 numeric_position = 0
                 if position:
                     try:
-                        numeric_position = int(position)
-                        if numeric_position <= 0:
+                        parsed_position = float(position)
+                        if parsed_position <= 0 or not parsed_position.is_integer():
                             counts["invalid_finish_position"] += 1
-                            numeric_position = 0
+                        else:
+                            numeric_position = int(parsed_position)
                     except ValueError:
                         counts["invalid_finish_position"] += 1
                 else:
