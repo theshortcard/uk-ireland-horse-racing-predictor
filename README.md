@@ -47,7 +47,7 @@ For historical evaluation, include `finish_position` and use only features and p
 python -m src.backtest --input path/to/historical.csv --output reports/backtest.md
 ```
 
-See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/timestamp recording, and rules for historical data. The current backtest evaluates only races with exactly one official winner; dead heats, voids, abandoned races, non-runners and complex settlement cases are not yet modelled.
+See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/timestamp recording, and rules for historical data. The backtest supports dead heats (split-stake settlement), excludes withdrawn runners, and skips void, abandoned and incomplete races. It also compares the model with normalized market-implied probabilities when every active runner has a valid price. See the [CSV data guide](docs/CSV_DATA_GUIDE.md) for result-status fields and limitations.
 
 ## Integrity rules
 
