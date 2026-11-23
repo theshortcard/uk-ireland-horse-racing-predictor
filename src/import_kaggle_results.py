@@ -12,6 +12,7 @@ import re
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
+import unicodedata
 
 # Explicit allowlists. Course aliases are normalised by removing bracketed
 # surface/region notes before matching; unrecognised names are never guessed.
@@ -20,11 +21,11 @@ IRE_COURSES = {
     "galway", "gowran park", "kilbeggan", "killarney", "laytown",
     "leopardstown", "limerick", "listowel", "naas", "navan", "punchestown",
     "roscommon", "sligo", "thurles", "tipperary", "tramore", "wexford",
-    "curragh", "the curragh",
+    "curragh", "the curragh", "down royal", "ballinrobe", "tralee",
 }
 GB_COURSES = {
     "ascot", "ayr", "bangor-on-dee", "bangor", "bath", "beverley", "brighton",
-    " Carlisle".strip(), "cartmel", "catterick", "chelmsford", "cheltenham",
+    "carlisle", "cartmel", "catterick", "chelmsford", "cheltenham",
     "chepstow", "chester", "doncaster", "epsom", "exeter", "fakenham",
     "fontwell", "goodwood", "hamilton", "haydock", "hereford", "hexham",
     "huntingdon", "kelso", "kempton", "leicester", "lingfield", "ludlow",
@@ -33,7 +34,8 @@ GB_COURSES = {
     "redcar", "ripon", "salisbury", "sandown", "sedgefield", "southwell",
     "stratford", "taunton", "thirsk", "uttoxeter", "warwick", "wetherby",
     "wincanton", "windsor", "wolverhampton", "worcester", "york",
-    "folkestone", "great yarmouth", "leicester", "towcester",
+    "folkestone", "great yarmouth", "yarmouth", "leicester", "towcester",
+    "ffos las", "aintree",
 }
 OUTPUT_FIELDS = [
     "race_id", "date", "course", "country", "off_time", "horse",
@@ -50,7 +52,9 @@ def clean(value: object) -> str:
 
 
 def normalise_course(value: str) -> str:
-    value = re.sub(r"\s*\([^)]*\)", "", clean(value)).strip()
+    value = unicodedata.normalize("NFKC", clean(value)).replace("\u00a0", " ")
+    value = value.replace("\u200b", "").replace("\ufeff", "")
+    value = re.sub(r"\s*\([^)]*\)", "", value).strip()
     return re.sub(r"\s+", " ", value).casefold()
 
 
