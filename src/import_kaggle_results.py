@@ -50,14 +50,14 @@ def clean(value: object) -> str:
 
 
 def normalise_course(value: str) -> str:
-    value = re.sub(r"\\s*\\([^)]*\\)", "", clean(value)).strip()
-    return re.sub(r"\\s+", " ", value).casefold()
+    value = re.sub(r"\s*\([^)]*\)", "", clean(value)).strip()
+    return re.sub(r"\s+", " ", value).casefold()
 
 
 def classify_course(value: str) -> str | None:
     raw = clean(value)
     # Explicit country suffix is useful only when it agrees with a known course.
-    suffix_ire = bool(re.search(r"\\(IRE\\)\\s*$", raw, re.I))
+    suffix_ire = bool(re.search(r"\(IRE\)\s*$", raw, re.I))
     name = normalise_course(raw)
     if name in IRE_COURSES:
         return "IRE"
@@ -87,7 +87,7 @@ def convert_row(row: dict[str, str], source_file: str) -> dict[str, str] | None:
         return None
 
     raw_pos = clean(row.get("pos"))
-    numeric_position = raw_pos if re.fullmatch(r"\\d+(?:\\.0)?", raw_pos) else ""
+    numeric_position = raw_pos if re.fullmatch(r"\d+(?:\.0)?", raw_pos) else ""
     # SP is preserved only as source context. It is never a decimal price.
     return {
         "race_id": race_id,
