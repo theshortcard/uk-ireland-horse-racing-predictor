@@ -39,7 +39,7 @@ def test_unverified_prices_suppress_market_edge_and_ev():
 
 def test_verified_complete_market_can_show_edge_and_ev():
     report = build_report([_verified_row("Runner A", 110), _verified_row("Runner B", 90)], [])
-    assert "PRICE PROVENANCE GATE: PASSED" in report
+    assert "Price provenance gate: PASSED" in report
     assert "Market fair %" in report
     assert "Edge (pp)" in report
     assert "Model fair odds" in report
