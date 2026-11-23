@@ -130,6 +130,15 @@ def main() -> int:
         print(f"{key}: {value:,}")
     print("Winner-count distribution: " + json.dumps(report["winner_count_distribution"], sort_keys=True))
     print(f"Anomaly examples recorded: {len(report['anomaly_examples_max_30'])}")
+    for example in report["anomaly_examples_max_30"]:
+        winners = [runner["horse"] for runner in example["runners"] if runner["research_win_outcome"] == "1"]
+        sample = {
+            "date": example["date"], "country": example["country"],
+            "course": example["course"], "off_time": example["off_time"],
+            "race_id": example["race_id"], "runner_count": example["runner_count"],
+            "winner_count": example["recorded_winner_count"], "winner_horses": winners,
+        }
+        print("ANOMALY_SAMPLE: " + json.dumps(sample, ensure_ascii=False))
     print(f"Audit JSON: {args.output}")
     return 0
 
