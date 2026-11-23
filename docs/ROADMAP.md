@@ -24,6 +24,8 @@
 
 ## Phase 3 — data
 - [x] Review candidate free sources and document licence/coverage constraints
+- [x] Add dataset source manifest and SHA-256 integrity validator
+- [x] Identify a CC BY aggregate benchmark source (not runner-level training data)
 - [ ] Secure a permitted UK racecard and results feed
 - [ ] Secure a permitted Irish racecard and results feed
 - [ ] Automate source metadata and collection timestamps
