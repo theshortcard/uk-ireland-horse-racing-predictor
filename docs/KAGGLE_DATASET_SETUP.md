@@ -42,3 +42,28 @@ In particular, SP is not a timestamped pre-race bookmaker quote. It must not be 
 The listing currently identifies CDLA-Sharing-1.0. Read the [licence text](https://cdla.dev/sharing-1-0/) and retain its attribution and change-notice requirements. Do not redistribute raw or enhanced data unless we can comply with the same licence. Computational results are treated separately by that licence.
 
 No performance, profitability or betting-edge claim will be made from fictional sample files or from this archive until provenance, mapping, leakage controls and out-of-sample testing have been completed.
+
+
+## Conservative staging importer
+
+The repository includes a separate importer, but it does **not** certify the community archive or make it approved model-training data. After downloading and extracting the archive locally, run it against the CSV files (the archive paths may differ if Kaggle changes its packaging):
+
+```bash
+python -m src.import_kaggle_results \
+  --input path/to/1988-2004.csv \
+  --input path/to/2005-2014.csv \
+  --input path/to/raceform.csv \
+  --output data/external/kaggle_results_staging.csv
+```
+
+The importer:
+- includes only course names in explicit GB/IRE allowlists; overseas and unknown venues are excluded rather than guessed;
+- removes repeated CSV header rows and rows missing core race identity fields;
+- maps the source's `age`, `or`, `pos`, and `sp` fields to separate staging fields;
+- leaves `odds_decimal`, odds-source and odds-capture timestamps blank; source SP is preserved only in `source_sp`;
+- sets `result_status=UNVERIFIED` and leaves result source/verification fields blank;
+- writes only to the requested staging path (the default location is ignored by Git).
+
+Course allowlists are deliberately conservative and incomplete. A course excluded by the importer may still be a valid GB or Irish venue; review the excluded-course counts and extend the allowlists only after checking each venue. The importer does not resolve duplicate runners, verify finishing positions, prove source rights, or make results official. It also does not calculate ROI. Do not change UNVERIFIED to COMPLETED or supply odds fields unless the relevant source and permissions have been independently established.
+
+The raw archive is not uploaded to this repository by this tool. Keep downloaded data outside GitHub and comply with the dataset licence and upstream source terms.
