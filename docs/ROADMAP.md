@@ -11,6 +11,7 @@
 - [x] Race identity protection in reports and historical backtests
 - [x] Blank racecard and historical CSV templates
 - [x] Data dictionary and source/timestamp recording guide
+- [x] Provenance audit for timezone-aware timestamps and pre-off odds
 
 ## Phase 2 — evaluation
 - [x] Historical backtest framework
