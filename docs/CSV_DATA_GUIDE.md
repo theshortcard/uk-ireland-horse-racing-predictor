@@ -62,3 +62,16 @@ python -m src.provenance --input path/to/your_file.csv
 The audit checks that each row names its source and retrieval timestamp, that timestamps include an explicit timezone offset, and that priced runners include an odds source and capture time. It checks that odds were captured strictly before the scheduled off using the UK/Ireland race timezone (Europe/London), and that the capture time does not follow the row retrieval time. Historical rows with a finish position must include a result source and timezone-aware verification timestamp.
 
 The audit checks the supplied metadata; it cannot independently prove that a provider actually supplied the data or that its licence permits your intended use. Keep original provider records and terms alongside your CSV.
+
+
+## Dataset source manifest
+
+Before importing any external archive, keep a separate `data/source_manifest.json` alongside the downloaded file. Start from `data/source_manifest.template.json` and record the exact dataset name, provider, source URL, licence and licence URL, timezone-aware download timestamp, relative file path, SHA-256 checksum, coverage dates, countries, and provenance notes.
+
+Run:
+
+```bash
+python -m src.manifest --input data/source_manifest.json
+```
+
+The command validates the required metadata, checks GB/IRE coverage labels and date ranges, rejects unsafe relative paths, and verifies the referenced file's SHA-256 checksum. A valid manifest proves that the recorded file matches its checksum; it does not prove the provider's claims or grant permission beyond the licence actually supplied with that dataset. Never put API keys, passwords or other secrets in a manifest.
