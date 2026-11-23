@@ -157,3 +157,33 @@ def test_backtest_returns_model_and_market_calibration_metrics():
     result = evaluate(rows)
     assert result["model_calibration_ece"] is not None
     assert result["market_calibration_ece"] is not None
+
+
+
+def test_official_rating_only_benchmark_is_reported():
+    rows = [
+        {"race_id": "OR1", "horse": "Highest Rated Winner", "horse_age": "5",
+         "official_rating": "110", "days_since_run": "20", "odds_decimal": "3.0",
+         "finish_position": "1"},
+        {"race_id": "OR1", "horse": "Lower Rated", "horse_age": "6",
+         "official_rating": "90", "days_since_run": "30", "odds_decimal": "6.0",
+         "finish_position": "2"},
+    ]
+    result = evaluate(rows)
+    assert result["rating_benchmark_races"] == 1
+    assert result["rating_benchmark_top_pick_wins"] == 1
+    assert result["rating_benchmark_top_pick_win_rate"] == pytest.approx(1.0)
+    assert result["rating_benchmark_flat_stake_roi"] == pytest.approx(2.0)
+
+
+def test_official_rating_benchmark_skips_races_with_missing_ratings():
+    rows = [
+        {"race_id": "OR2", "horse": "Winner", "horse_age": "5",
+         "official_rating": "100", "odds_decimal": "2.0", "finish_position": "1"},
+        {"race_id": "OR2", "horse": "No Rating", "horse_age": "5",
+         "official_rating": "", "odds_decimal": "4.0", "finish_position": "2"},
+    ]
+    result = evaluate(rows)
+    assert result["rating_benchmark_races"] == 0
+    assert result["rating_benchmark_top_pick_win_rate"] is None
+    assert result["rating_benchmark_flat_stake_roi"] is None
