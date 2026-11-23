@@ -47,4 +47,13 @@ jobs:
 
           python scripts/audit_kaggle_archive.py "$RUNNER_TEMP/kaggle"
 
+          echo "=== Conservative GB/IRE staging counts (temporary output only) ==="
+          mapfile -t SOURCE_CSVS < <(find "$RUNNER_TEMP/kaggle" -type f -name '*.csv' | sort)
+          IMPORT_ARGS=()
+          for source_csv in "${SOURCE_CSVS[@]}"; do
+            IMPORT_ARGS+=(--input "$source_csv")
+          done
+          python -m src.import_kaggle_results "${IMPORT_ARGS[@]}" --output "$RUNNER_TEMP/kaggle/staging.csv"
+          rm -f "$RUNNER_TEMP/kaggle/staging.csv"
+
           rm -f "$HOME/.kaggle/kaggle.json"
