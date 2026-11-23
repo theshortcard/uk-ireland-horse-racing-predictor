@@ -32,10 +32,14 @@ def main() -> int:
         if not args.allow_blocked_provenance:
             return 1
         print("Continuing because --allow-blocked-provenance was explicitly supplied; no market edge or EV is published.")
+    else:
+        print("Price provenance checks passed. Market comparisons may be shown only for complete priced fields.")
 
-    print("Price provenance checks passed. Market comparisons may be shown only for complete priced fields.")
     if validation_issues:
         return 1
+    if provenance_issues:
+        print("Demo report generated; provenance remains blocked and market edge/EV remain suppressed.")
+        return 0
     print("Completed with no structural or provenance issues.")
     return 0
 
