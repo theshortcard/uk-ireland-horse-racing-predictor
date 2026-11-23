@@ -46,3 +46,9 @@ def test_non_finite_odds_are_flagged():
     rows = [dict(RUNNERS[0], odds_decimal="nan")]
     issues = validate_racecard(rows)
     assert any("odds_decimal must be a finite number" in issue for issue in issues)
+
+
+def test_finish_position_does_not_change_prediction():
+    before = dict(RUNNERS[0], finish_position="1")
+    after = dict(RUNNERS[0], finish_position="8")
+    assert predict_race([before])[0]["win_probability"] == predict_race([after])[0]["win_probability"]
