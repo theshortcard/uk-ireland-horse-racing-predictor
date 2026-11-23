@@ -36,7 +36,7 @@ def chronological_split(
     dates = sorted({(row.get("date") or "").strip() for row in rows if (row.get("date") or "").strip()})
     if len(dates) < 2:
         raise ValueError("A chronological holdout requires at least two distinct race dates.")
-    split_at = max(1, min(len(dates) - 1, int(len(dates) * (1.0 - test_fraction))))
+    split_at = max(1, min(len(dates) - 1, math.ceil(len(dates) * (1.0 - test_fraction))))
     training_dates = set(dates[:split_at])
     holdout_dates = set(dates[split_at:])
     training_rows = [row for row in rows if (row.get("date") or "").strip() in training_dates]
