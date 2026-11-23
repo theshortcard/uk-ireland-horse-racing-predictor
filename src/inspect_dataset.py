@@ -24,7 +24,8 @@ def inspect_csv(path: str | Path) -> dict[str, object]:
     column_counts: Counter[str] = Counter()
     examples: dict[str, list[str]] = {}
     country_counts: Counter[str] = Counter()
-    date_values: list[str] = []
+    date_min: str | None = None
+    date_max: str | None = None
     row_count = 0
 
     with file_path.open("r", encoding="utf-8-sig", newline="") as handle:
@@ -55,7 +56,9 @@ def inspect_csv(path: str | Path) -> dict[str, object]:
             if country_col and (row.get(country_col) or "").strip():
                 country_counts[(row[country_col] or "").strip()] += 1
             if date_col and (row.get(date_col) or "").strip():
-                date_values.append((row[date_col] or "").strip())
+                date_value = (row[date_col] or "").strip()
+                date_min = date_value if date_min is None else min(date_min, date_value)
+                date_max = date_value if date_max is None else max(date_max, date_value)
 
     if row_count == 0:
         raise ValueError("CSV contains a header but no data rows.")
@@ -79,8 +82,8 @@ def inspect_csv(path: str | Path) -> dict[str, object]:
         "columns": columns,
         "roles": roles,
         "country_counts": dict(sorted(country_counts.items())),
-        "date_min": min(date_values) if date_values else None,
-        "date_max": max(date_values) if date_values else None,
+        "date_min": date_min,
+        "date_max": date_max,
     }
 
 
