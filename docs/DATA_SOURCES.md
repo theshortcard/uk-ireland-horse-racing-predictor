@@ -155,3 +155,27 @@ Projects and terms:
 - Original scraper: https://github.com/robinhowlett/rpscrape
 - Community continuation: https://github.com/Eatkin/rpscrape-community
 - Racing Post terms: https://help.racingpost.com/hc/en-us/articles/208996085-Terms-and-conditions
+
+
+### The Racing API — strongest current free daily-racecard candidate
+
+Provider: https://www.theracingapi.com/  
+Documentation: https://api.theracingapi.com/documentation  
+Terms: https://www.theracingapi.com/terms-of-service
+
+- This is a separate service from RacingAPI.net and Horse Racing API UK. The provider advertises a £0/month Free plan.
+- Its official site states that core coverage includes UK and Irish racing. The documentation's free `GET /v1/racecards/free` endpoint supplies basic racecards for today and tomorrow, with region filters; `GET /v1/courses` and `GET /v1/courses/regions` are also marked Free.
+- Free-plan rate limit: 1 request per second across endpoints. The free racecard endpoint is basic data only; the Standard racecard endpoint is the one that explicitly includes runner odds. Therefore do not expect bookmaker prices from the free plan.
+- Do not assume every category named in the API (horses, jockeys, trainers, etc.) is free. Each endpoint has its own minimum plan: for example, horse search is marked Standard and full horse historical results are marked Pro in the current docs.
+- The provider's plan page says the Free plan includes daily basic racecards and results for races on those daily racecards. This is a useful prospective source for basic racecards/results, but not a historical bulk archive or pre-off odds feed.
+- The provider explicitly describes statistical research and betting-model/strategy development as permitted use cases, and prohibits use in a commercial or operational capacity by betting operators and sportsbooks. That restriction does not on its face prohibit an individual's personal research predictor; do not represent this project as a sportsbook or betting operator.
+- The terms prohibit resale of data without permission. They do not clearly spell out long-term local retention, bulk export, or historical model-training rights. Before accumulating a permanent training archive, ask the provider to confirm those specific rights in writing.
+- Decision: add to the priority list for a free-tier signup and controlled schema test. Do not upgrade, start a paid plan, or treat this as sufficient for EV until timestamped pre-off odds and their permitted use are secured. Store credentials only as GitHub Actions secrets; never commit them or paste them into chat.
+
+### Free-tier limitations and next validation
+
+1. Confirm the account is actually on the £0 Free plan and that no card or paid trial is activated.
+2. Test only the documented Free endpoints at no more than 1 request/second.
+3. Save one small, local-only sample response and inspect the actual runner fields, GB/IRE region codes, race identifiers, declared runners, and results availability.
+4. Ask the provider in writing whether personal private model training and retention of retrieved racecard/results data are allowed, and whether any export or retention limits apply.
+5. Keep the market EV/provenance gate closed: the free tier does not explicitly provide runner odds, so no market edge or EV may be calculated from it.
