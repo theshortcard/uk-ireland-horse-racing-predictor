@@ -51,6 +51,39 @@ Terms: https://www.britishhorseracing.com/terms-conditions/
 
 Terms: https://irishhorseracing.com/terms
 
+## Additional provider and official-source review — 23 November 2026
+
+### HorseRacingAPI.org — free result lookup, not a training-data feed
+
+This is a separate provider from APIHorseRacing.com and Horse Racing API UK.
+
+- Its free key returns yesterday's results across Great Britain, Ireland (including Northern Ireland), France, and the USA, with a limit of 50 calls per day.
+- It does not provide racecards, bookmaker odds, or bulk downloads on the free key.
+- Its terms expressly prohibit bulk downloading to rebuild its database, reselling/redistributing the data, or using it to build a competing product.
+- Decision: it may be useful for an occasional result cross-check in the user's own work, but we will not automatically accumulate its responses into a historical training archive or build a competing results database. Seek written clarification from the provider before any retained training-data use.
+
+Coverage and free-key details: https://horseracingapi.org/
+Terms: https://horseracingapi.org/terms
+
+### RacingAPI.net — relevant UK/IRE coverage, but paid
+
+- Its published coverage describes combined UK and Irish racecards, declared runners, results, form summaries and supplied bookmaker prices.
+- Racecards require an active subscription, confirmed trial or approved access. The public pricing page lists Developer at £29/month; a seven-day trial requires a payment card and renews unless cancelled.
+- Decision: technically relevant but outside the £0 monthly data budget. Do not start a card-required trial or integrate it as a free source. Revisit only if the budget changes and the exact data licence, odds timestamps, retention rights and model-training permissions are confirmed.
+
+Coverage: https://racingapi.net/coverage
+Pricing and trial terms: https://racingapi.net/
+
+### BHA official racing data packs — aggregate statistics only
+
+The BHA publishes official annual and monthly racing data packs as PDFs. These are useful for high-level context and checking broad totals, but the public statistics page does not offer the runner-by-runner racecard/result feed or timestamped pre-off prices required by this predictor. We will not treat these PDFs as a replacement for runner-level training data.
+
+Statistics page: https://www.britishhorseracing.com/regulation/reports-and-statistics/racing-statistics/
+
+### Current conclusion
+
+As of this review, we have not identified a source that is simultaneously free, UK-and-Ireland complete, runner-level, suitable for permitted historical model training, and capable of supplying timestamped pre-race bookmaker prices. Free result-only endpoints and aggregate PDFs do not meet the complete requirement. The project therefore remains in software/testing mode until a suitable source or explicit permission is obtained.
+
 ## Current implementation decision
 
 1. Use user-supplied CSV data immediately.
