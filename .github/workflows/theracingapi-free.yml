@@ -26,10 +26,17 @@ jobs:
           RACING_API_PASSWORD: ${{ secrets.RACING_API_PASSWORD }}
         run: |
           python -m src.fetch_racecards_api --day "${{ inputs.day }}" --output-dir data/external/theracingapi
-      - name: Upload temporary snapshot for schema inspection
+      - name: Audit the saved racecard snapshot
+        run: |
+          snapshot="$(find data/external/theracingapi -maxdepth 1 -type f -name 'racecards_*.json' | head -n 1)"
+          test -n "$snapshot"
+          python -m src.audit_free_racecard "$snapshot" --output "reports/free-racecard-audit-${{ inputs.day }}.json"
+      - name: Upload snapshot and audit report
         uses: actions/upload-artifact@v6
         with:
           name: theracingapi-free-racecard-${{ inputs.day }}
-          path: data/external/theracingapi/*
+          path: |
+            data/external/theracingapi/*
+            reports/free-racecard-audit-${{ inputs.day }}.json
           if-no-files-found: error
           retention-days: 1
