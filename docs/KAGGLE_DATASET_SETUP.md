@@ -7,6 +7,36 @@
 - The public listing currently reports approximately 1.34 GB and CDLA-Sharing-1.0. The listing says it was updated to 20 November 2026.
 - The archive is a community dataset, not an official BHA/IHRB feed. Its original record-level provenance and field definitions must be reviewed before we rely on it.
 
+## Provenance and upstream-rights blocker
+
+The archive's own bundled README identifies its upstream source as the
+[Sporting-Life-Results-Scraper project](https://github.com/tastethewhip/Sporting-Life-Results-Scraper)
+and links to its GitLab project. This is important: the Kaggle listing's
+CDLA-Sharing-1.0 label is not, by itself, proof that the uploader had permission
+to republish all upstream material under that agreement.
+
+Sporting Life's published terms currently state that data capture (including
+screen scraping) is prohibited and that its content/data may not be copied,
+reproduced, stored or transmitted without explicit permission
+([Sporting Life terms](https://www.sportinglife.com/terms-and-conditions)).
+The CDLA-Sharing-1.0 agreement also relies on the Data Provider's representation
+that it created the data or obtained it from others with the right to publish
+it (section 4.1). We have not found documentation establishing that permission
+for this archive.
+
+**Decision: treat the Kaggle archive as rights-unverified and do not use it to
+train, backtest, publish derived datasets, or support betting/ROI claims unless
+the uploader can document the upstream permissions or a suitable rights holder
+confirms permission.** This is a provenance/permission gap, not a legal finding
+that infringement occurred. Keep the existing importer and audit as diagnostic
+code only; do not retain or redistribute downloaded source files.
+
+The CDLA-Sharing-1.0 terms distinguish computational results from the data
+itself (section 3.5), and require received/enhanced data to remain under the
+same agreement if published (section 3). Those provisions do not resolve
+whether the Kaggle uploader had authority to grant the licence in the first
+place. See the [CDLA-Sharing-1.0 text](https://cdla.dev/sharing-1-0/).
+
 ## Why we are not committing the archive to GitHub
 
 The archive is too large for normal GitHub source control. The repository must contain code and documentation only; raw data stays outside Git. The dataset licence also has sharing and attribution obligations. Do not upload the raw archive or an enhanced copy to this public repository.
