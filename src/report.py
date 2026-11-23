@@ -41,22 +41,29 @@ def build_report(rows: list[dict[str, str]], issues: list[str]) -> str:
         race_id = first.get("race_id", "UNKNOWN")
         lines.append(f"### {race_id} — {first.get('course', 'Unknown course')} ({first.get('date', 'date unknown')} {first.get('off_time', '')})")
         lines.append("")
-        lines.append("| Rank | Horse | Model win % | Odds | Raw EV % |")
-        lines.append("|---:|---|---:|---:|---:|")
+        lines.append("| Rank | Horse | Model win % | Market fair % | Edge (pp) | Model fair odds | Odds | Raw EV % |")
+        lines.append("|---:|---|---:|---:|---:|---:|---:|---:|")
         for rank, item in enumerate(predict_race(runners), start=1):
             odds = item.get("odds_decimal")
             ev = item.get("expected_value")
+            market_probability = item.get("market_probability")
+            edge = item.get("probability_edge")
+            fair_odds = item.get("fair_odds")
             odds_text = f"{float(odds):.2f}" if odds not in (None, "") else "Not supplied"
             ev_text = f"{float(ev) * 100:.1f}%" if ev is not None else "Not available"
-            lines.append(f"| {rank} | {item.get('horse', '')} | {float(item['win_probability']) * 100:.1f}% | {odds_text} | {ev_text} |")
+            market_text = f"{float(market_probability) * 100:.1f}%" if market_probability is not None else "Incomplete book"
+            edge_text = f"{float(edge) * 100:+.1f}" if edge is not None else "N/A"
+            fair_odds_text = f"{float(fair_odds):.2f}" if fair_odds is not None else "N/A"
+            lines.append(f"| {rank} | {item.get('horse', '')} | {float(item['win_probability']) * 100:.1f}% | {market_text} | {edge_text} | {fair_odds_text} | {odds_text} | {ev_text} |")
         lines.append("")
 
     lines.extend([
         "## Interpretation",
         "",
         "- The model currently uses a simple rating-led heuristic with small age/recency adjustments.",
-        "- Raw EV is shown only when decimal odds are supplied; it does not remove bookmaker margin or account for price freshness.",
-        "- Do not treat positive raw EV as a bet recommendation until the model is backtested and calibrated on suitable historical data.",
+        "- Market fair probabilities are normalized across all runners only when every runner has a valid price; the edge is model probability minus normalized market probability (percentage points).",
+        "- Model fair odds are the inverse of the model probability. Raw EV uses the supplied decimal price and does not remove bookmaker margin or account for price freshness.",
+        "- Do not treat positive raw EV or a positive probability edge as a bet recommendation until the model is backtested and calibrated on suitable historical data.",
         "- Example rows are fictional and must never be mistaken for real race information.",
         "",
     ])
