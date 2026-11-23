@@ -7,8 +7,7 @@ A zero-monthly-data-budget project for UK and Irish horse racing, designed to pr
 The first working baseline is in the repository:
 - CSV racecard import and data-quality validation
 - Explainable rating-led win probability estimates
-- Optional raw EV calculation when decimal odds are supplied
-- Normalized market fair probabilities, model-vs-market probability edge and model fair odds when the full field is priced
+- Experimental model fair odds; market fair probabilities, model-vs-market edge and raw EV are displayed only when the full field has valid prices and the price-provenance audit passes
 - Markdown race report and historical backtest
 - Blank CSV templates with source and timestamp fields
 - Automated pytest checks and GitHub Actions workflow
@@ -28,7 +27,7 @@ python -m src.provenance --input path/to/your_racecard.csv
 python -m src.manifest --input data/source_manifest.json
 ```
 
-The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. Run `src.provenance` on your own CSV to check source fields, timestamp offsets, result verification and whether odds were captured before the scheduled off. Copy `data/source_manifest.template.json` to `data/source_manifest.json`, fill in the exact source and licence details, and run `src.manifest` to validate the metadata and verify the dataset SHA-256 checksum.
+The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. The daily report independently audits provenance and suppresses market fair probabilities, model-vs-market edges and raw EV unless source names, retrieval timestamps, odds sources and timezone-aware pre-off price-capture timestamps pass. The command exits non-zero when provenance is blocked. Run `src.provenance` separately to inspect source fields, timestamp offsets, result verification and whether odds were captured before the scheduled off. Copy `data/source_manifest.template.json` to `data/source_manifest.json`, fill in the exact source and licence details, and run `src.manifest` to validate the metadata and verify the dataset SHA-256 checksum.
 
 ## Historical archive status: rights not cleared
 
@@ -88,7 +87,7 @@ See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/t
 
 - Never invent racecards, runners, non-runners, results, odds, or prices.
 - Clearly label missing, stale, estimated, or unverified information.
-- EV is a raw estimate and does not remove bookmaker margin. Market fair probabilities require valid prices for every runner.
+- EV is a raw estimate and does not remove bookmaker margin. Market fair probabilities require valid prices for every runner and a passing price-provenance audit; otherwise edge and EV are suppressed.
 - Do not treat positive EV as a betting recommendation until the model is calibrated and tested out of sample.
 - Keep historical evaluation separate from live predictions to prevent data leakage.
 - Use only data whose terms permit the intended collection, storage, and model-development use.
