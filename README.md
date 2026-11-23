@@ -44,7 +44,7 @@ python -m src.inspect_dataset --input path/to/source.csv --output reports/datase
 
 This read-only utility streams the file and reports row/column counts, missing values, sample values, and likely date/country/horse/odds/result columns. It does not certify the source, licence, field meanings, or pre-race availability. Review those manually before building an import mapping.
 
-An optional results snapshot utility can save yesterday's settled results from APIHorseRacing.com. It stores the raw JSON and a SHA-256/retrieval-time sidecar under `data/external/`, which is excluded from Git. It does not map records into the predictor or provide pre-race prices.
+An optional conservative importer can stage the inspected Kaggle archive's recognised GB/IRE course records into a separate CSV. It excludes unknown/overseas courses, keeps source SP in a separate field, leaves decimal odds blank, and marks all results UNVERIFIED. It is not approved backtest input until provenance and results are independently checked. See [the Kaggle staging guide](docs/KAGGLE_DATASET_SETUP.md).\n\nAn optional results snapshot utility can save yesterday's settled results from APIHorseRacing.com. It stores the raw JSON and a SHA-256/retrieval-time sidecar under `data/external/`, which is excluded from Git. It does not map records into the predictor or provide pre-race prices.
 
 Set `AHR_API_KEY` in your local environment (never paste the key into ChatGPT or commit it), then run:
 
