@@ -1,37 +1,49 @@
 # UK & Ireland Horse Racing Predictor
 
-A zero-monthly-data-budget project for UK and Irish horse racing, designed to produce race-level win probabilities, ranked selections, and transparent value/expected-value (EV) assessments.
+A zero-monthly-data-budget project for UK and Irish horse racing, designed to produce race-level win probabilities, ranked runners, and transparent value/expected-value (EV) assessments.
 
-## Project goals
+## Current status
 
-- Cover race meetings in Great Britain and Ireland.
-- Produce probability-based race predictions, not just tip lists.
-- Compare model probabilities with available bookmaker odds when supplied.
-- Flag potential value only when the price, data quality, and assumptions are sufficiently reliable.
-- Keep recurring data costs at £0 / C$0 by prioritising official or freely accessible sources and user-supplied odds.
+The first working baseline is now in the repository:
+- CSV racecard import and data-quality validation
+- Explainable rating-led win probability estimates
+- Optional raw EV calculation when decimal odds are supplied
+- Markdown race report
+- Automated pytest checks and GitHub Actions workflow
 
-## Safety and integrity rules
+**Important:** this is an experimental baseline, not a trained or proven profitable model. The sample racecard contains fictional runners solely to test the software. It is not a live racecard.
+
+## Run it
+
+Requires Python 3.10 or newer.
+
+```bash
+python -m pip install -r requirements.txt
+python -m pytest -q
+python -m src.run --input data/sample_racecard.csv --output reports/daily_report.md
+```
+
+The report is created at `reports/daily_report.md`. To use your own racecard, make a CSV with the same columns as `data/sample_racecard.csv`, then replace the input path:
+
+```bash
+python -m src.run --input path/to/your_racecard.csv --output reports/daily_report.md
+```
+
+Required CSV columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available.
+
+## Integrity rules
 
 - Never invent racecards, runners, non-runners, results, odds, or prices.
 - Clearly label missing, stale, estimated, or unverified information.
-- Do not publish an EV recommendation without a usable price and an explicit probability estimate.
+- EV is calculated only when a valid decimal price is supplied; it is a raw estimate and does not remove bookmaker margin.
+- Do not treat a positive EV estimate as a betting recommendation until the model is calibrated and tested out of sample.
 - Keep historical evaluation separate from live predictions to prevent data leakage.
-- Track model performance with calibration, log loss, Brier score, and return-on-investment metrics where valid odds/results exist.
+- Track calibration, log loss, Brier score, and ROI only where valid historical odds/results exist.
 
-## Planned components
+## Zero-cost data policy
 
-1. **Data ingestion** — racecards, runners, race conditions, results, and freely available historical data.
-2. **Data validation** — duplicate checks, missing fields, timestamps, and source provenance.
-3. **Feature engineering** — horse, trainer, jockey, course, distance, going, class, and recency features where reliable data is available.
-4. **Prediction** — baseline probability model followed by measured improvements.
-5. **Value engine** — implied probabilities, overround handling, expected value, and price thresholds.
-6. **Reporting** — daily UK and Ireland race summaries with confidence and data-quality labels.
-7. **Testing and audit** — reproducible tests, backtesting, and leakage checks.
+No paid API or monthly subscription is assumed. User-supplied CSV files are supported now. Automated UK and Irish data feeds will only be added after checking their availability, licensing, terms, reliability, and permitted access. See [Data sources](docs/DATA_SOURCES.md).
 
-## Initial development principle
+## Roadmap
 
-Start with a transparent, testable baseline. Add data sources and model complexity only when their availability, licence/terms, and reliability have been checked. The system must remain usable without paid APIs.
-
-## Status
-
-Repository initialized. Data-source discovery and the first working baseline are next.
+See [development roadmap](docs/ROADMAP.md) for the remaining work: permitted free data sources, historical results, non-runner handling, leakage-safe backtesting, improved features, and daily automation.
