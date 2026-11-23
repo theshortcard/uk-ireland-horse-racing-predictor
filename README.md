@@ -4,14 +4,15 @@ A zero-monthly-data-budget project for UK and Irish horse racing, designed to pr
 
 ## Current status
 
-The first working baseline is now in the repository:
+The first working baseline is in the repository:
 - CSV racecard import and data-quality validation
 - Explainable rating-led win probability estimates
 - Optional raw EV calculation when decimal odds are supplied
-- Markdown race report
+- Markdown race report and historical backtest
+- Blank CSV templates with source and timestamp fields
 - Automated pytest checks and GitHub Actions workflow
 
-**Important:** this is an experimental baseline, not a trained or proven profitable model. The sample racecard contains fictional runners solely to test the software. It is not a live racecard.
+**Important:** this is an experimental baseline, not a trained or proven profitable model. The sample racecard and sample historical file contain fictional runners solely to test the software. They are not live racing data.
 
 ## Run it
 
@@ -24,27 +25,43 @@ python -m src.run --input data/sample_racecard.csv --output reports/daily_report
 python -m src.backtest --input data/sample_historical.csv --output reports/backtest.md
 ```
 
-The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`. To use your own racecard, make a CSV with the same columns as `data/sample_racecard.csv`, then replace the input path:
+The daily report is created at `reports/daily_report.md`, and the fictional historical example produces `reports/backtest.md`.
+
+## Use your own data
+
+Start with:
+- `data/racecard_template.csv` for pre-race predictions.
+- `data/historical_template.csv` for historical results and evaluation.
+
+Required racecard columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available.
+
+For a racecard, run:
 
 ```bash
 python -m src.run --input path/to/your_racecard.csv --output reports/daily_report.md
 ```
 
-Required CSV columns: `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`. Country must be `GB` or `IRE`. Leave `odds_decimal` blank if no verified price is available. For historical evaluation, add a `finish_position` column (see the fictional example `data/sample_historical.csv`) and run: `python -m src.backtest --input path/to/historical.csv --output reports/backtest.md`. The historical file must contain pre-race features and prices recorded before the off; the backtest excludes races without exactly one official winner.
+For historical evaluation, include `finish_position` and use only features and prices captured before the off:
 
-## Historical evaluation\n\nThe backtest reports top-pick win rate, multiclass Brier score, log loss, and flat-stake ROI when valid pre-race odds are present. It is not a guarantee of future performance. Dead heats, void races, non-runners and complex settlement cases are not yet modelled; exclude those records until explicit handling is added.\n\n## Integrity rules
+```bash
+python -m src.backtest --input path/to/historical.csv --output reports/backtest.md
+```
+
+See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/timestamp recording, and rules for historical data. The current backtest evaluates only races with exactly one official winner; dead heats, voids, abandoned races, non-runners and complex settlement cases are not yet modelled.
+
+## Integrity rules
 
 - Never invent racecards, runners, non-runners, results, odds, or prices.
 - Clearly label missing, stale, estimated, or unverified information.
-- EV is calculated only when a valid decimal price is supplied; it is a raw estimate and does not remove bookmaker margin.
-- Do not treat a positive EV estimate as a betting recommendation until the model is calibrated and tested out of sample.
+- EV is a raw estimate and does not remove bookmaker margin.
+- Do not treat positive EV as a betting recommendation until the model is calibrated and tested out of sample.
 - Keep historical evaluation separate from live predictions to prevent data leakage.
-- Track calibration, log loss, Brier score, and ROI only where valid historical odds/results exist.
+- Use only data whose terms permit the intended collection, storage, and model-development use.
 
 ## Zero-cost data policy
 
-No paid API or monthly subscription is assumed. User-supplied CSV files are supported now. Automated UK and Irish data feeds will only be added after checking their availability, licensing, terms, reliability, and permitted access. See [Data sources](docs/DATA_SOURCES.md).
+No paid API or monthly subscription is assumed. User-supplied CSV files are supported now. Automated UK and Irish data feeds will only be added after checking availability, licensing, terms, reliability, and permitted access. See [Data sources](docs/DATA_SOURCES.md).
 
 ## Roadmap
 
-See [development roadmap](docs/ROADMAP.md) for the remaining work: permitted free data sources, historical results, non-runner handling, leakage-safe backtesting, improved features, and daily automation.
+See [development roadmap](docs/ROADMAP.md) for the remaining work: permitted free data sources, historical results, settlement handling, leakage-safe backtesting, improved features, and daily automation.
