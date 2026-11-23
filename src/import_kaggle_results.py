@@ -40,7 +40,7 @@ OUTPUT_FIELDS = [
     "horse_age", "official_rating", "days_since_run", "odds_decimal",
     "odds_source", "odds_captured_at", "source_name", "retrieved_at",
     "finish_position", "runner_status", "result_status", "result_source",
-    "result_verified_at", "source_sp", "source_finish_code",
+    "result_verified_at", "source_sp", "source_finish_code", "source_archive_file",
 ]
 SOURCE_NAME = "Kaggle community archive: deltaromeo/horse-racing-results-ukireland-2015-2025"
 
@@ -110,7 +110,7 @@ def convert_row(row: dict[str, str], source_file: str) -> dict[str, str] | None:
         "result_source": "",
         "result_verified_at": "",
         "source_sp": clean(row.get("sp")),
-        "source_finish_code": "" if numeric_position else raw_pos,
+        "source_finish_code": "" if numeric_position else raw_pos,\n        "source_archive_file": source_file,
     }
 
 
