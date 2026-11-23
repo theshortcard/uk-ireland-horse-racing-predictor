@@ -21,8 +21,8 @@ def test_course_classification_is_conservative():
 
 def test_course_normalisation_removes_parenthetical_notes():
     assert normalise_course("Dundalk (AW) (IRE)") == "dundalk"
-    assert normalise_course("Carlisle\\u00a0") == "carlisle"
-    assert normalise_course("Carlisle\\u200b") == "carlisle"
+    assert normalise_course("Carlisle\u00a0") == "carlisle"
+    assert normalise_course("Carlisle\u200b") == "carlisle"
 
 
 def test_archive_starting_price_never_becomes_decimal_odds():
