@@ -81,7 +81,7 @@ See [the CSV data guide](docs/CSV_DATA_GUIDE.md) for field definitions, source/t
 
 ## Zero-cost data policy
 
-No paid API or monthly subscription is assumed. User-supplied CSV files are supported now. Automated UK and Irish data feeds will only be added after checking availability, licensing, terms, reliability, and permitted access. See [Data sources](docs/DATA_SOURCES.md).
+No paid API or monthly subscription is assumed. User-supplied CSV files are supported now. Automated UK and Irish data feeds will only be added after checking availability, licensing, terms, reliability, and permitted access. See [Data sources](docs/DATA_SOURCES.md) and the [Kaggle archive setup guide](docs/KAGGLE_DATASET_SETUP.md) for the optional historical dataset inspection workflow.
 
 ## Roadmap
 
