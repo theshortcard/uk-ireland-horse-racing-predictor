@@ -38,8 +38,8 @@ jobs:
           printf '{"username":"%s","key":"%s"}' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > "$HOME/.kaggle/kaggle.json"
           chmod 600 "$HOME/.kaggle/kaggle.json"
 
-          kaggle datasets metadata -d delt ar omeo/horse-racing-results-ukireland-2015-2025 -p "$RUNNER_TEMP/kaggle" || true
-          kaggle datasets download -d delt ar omeo/horse-racing-results-ukireland-2015-2025 -p "$RUNNER_TEMP/kaggle" --unzip
+          kaggle datasets metadata -d deltaromeo/horse-racing-results-ukireland-2015-2025 -p "$RUNNER_TEMP/kaggle" || true
+          kaggle datasets download -d deltaromeo/horse-racing-results-ukireland-2015-2025 -p "$RUNNER_TEMP/kaggle" --unzip
 
           echo "=== Downloaded file inventory (raw data is not uploaded or committed) ==="
           find "$RUNNER_TEMP/kaggle" -type f -printf '%P | %s bytes\n' | sort
