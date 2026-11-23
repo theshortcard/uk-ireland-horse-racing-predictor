@@ -96,6 +96,10 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
     rating_benchmark_hits = 0
     rating_benchmark_roi_profit = 0.0
     rating_benchmark_roi_bets = 0
+    rating_brier_total = 0.0
+    rating_logloss_total = 0.0
+    rating_calibration_probabilities: list[float] = []
+    rating_calibration_outcomes: list[float] = []
     model_calibration_probabilities: list[float] = []
     model_calibration_outcomes: list[float] = []
     market_calibration_probabilities: list[float] = []
@@ -167,7 +171,24 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
             rating_values.append((item, rating))
         if len(rating_values) == len(predictions) and rating_values:
             rating_benchmark_races += 1
-            rating_pick = max(rating_values, key=lambda pair: pair[1])[0]
+            # Use the model's rating transform but omit age and recency adjustments.
+            rating_scores = [
+                math.exp(max(-20.0, min(20.0, (rating - 80.0) / 35.0)))
+                for _, rating in rating_values
+            ]
+            rating_score_total = sum(rating_scores)
+            rating_probabilities = [
+                (item, score / rating_score_total)
+                for (item, _), score in zip(rating_values, rating_scores)
+            ]
+            for item, probability in rating_probabilities:
+                target = target_by_horse[str(item.get("horse", "")).casefold()]
+                rating_calibration_probabilities.append(probability)
+                rating_calibration_outcomes.append(target)
+                rating_brier_total += (probability - target) ** 2
+                if target:
+                    rating_logloss_total += -target * math.log(max(probability, 1e-15))
+            rating_pick = max(rating_probabilities, key=lambda pair: pair[1])[0]
             rating_pick_key = str(rating_pick.get("horse", "")).casefold()
             rating_pick_won = rating_pick_key in winner_keys
             if rating_pick_won:
@@ -260,6 +281,9 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
         "market_flat_stake_roi": market_roi_profit / market_roi_bets if market_roi_bets else None,
         "rating_benchmark_races": rating_benchmark_races,
         "rating_benchmark_top_pick_wins": rating_benchmark_hits,
+        "rating_benchmark_mean_multiclass_brier": rating_brier_total / rating_benchmark_races if rating_benchmark_races else None,
+        "rating_benchmark_mean_log_loss": rating_logloss_total / rating_benchmark_races if rating_benchmark_races else None,
+        "rating_benchmark_calibration_ece": expected_calibration_error(rating_calibration_probabilities, rating_calibration_outcomes),
         "rating_benchmark_top_pick_win_rate": rating_benchmark_hits / rating_benchmark_races if rating_benchmark_races else None,
         "rating_benchmark_flat_stake_roi": rating_benchmark_roi_profit / rating_benchmark_roi_bets if rating_benchmark_roi_bets else None,
         "model_calibration_ece": expected_calibration_error(model_calibration_probabilities, model_calibration_outcomes),
@@ -317,6 +341,9 @@ def main() -> int:
         f"- Market favourite flat-stake ROI: {float(metrics['market_flat_stake_roi']) * 100:.1f}%" if metrics["market_flat_stake_roi"] is not None else "- Market favourite flat-stake ROI: Not available",
         f"- Official-rating-only benchmark races: {metrics['rating_benchmark_races']}",
         f"- Official-rating-only top-pick win rate: {float(metrics['rating_benchmark_top_pick_win_rate']) * 100:.1f}%" if metrics["rating_benchmark_top_pick_win_rate"] is not None else "- Official-rating-only top-pick win rate: Not available (incomplete ratings)",
+        f"- Official-rating-only Brier score: {float(metrics['rating_benchmark_mean_multiclass_brier']):.5f}" if metrics["rating_benchmark_mean_multiclass_brier"] is not None else "- Official-rating-only Brier score: Not available",
+        f"- Official-rating-only log loss: {float(metrics['rating_benchmark_mean_log_loss']):.5f}" if metrics["rating_benchmark_mean_log_loss"] is not None else "- Official-rating-only log loss: Not available",
+        f"- Official-rating-only calibration ECE: {float(metrics['rating_benchmark_calibration_ece']):.5f}" if metrics["rating_benchmark_calibration_ece"] is not None else "- Official-rating-only calibration ECE: Not available",
         f"- Official-rating-only flat-stake ROI: {float(metrics['rating_benchmark_flat_stake_roi']) * 100:.1f}%" if metrics["rating_benchmark_flat_stake_roi"] is not None else "- Official-rating-only flat-stake ROI: Not available",
         "",
         "## Data requirements",
