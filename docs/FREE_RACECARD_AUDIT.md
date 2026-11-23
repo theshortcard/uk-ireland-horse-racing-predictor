@@ -30,7 +30,15 @@ Workflow run `45124155080`, artifact `theracingapi-free-racecard-today`, retriev
 
 The race count and meeting breakdown matched independent same-date published listings (38 races across the same five courses). The API's Newcastle 16:40 record contains 8 runner objects while `field_size` is 7. Racing Post's same-date non-runner listing identifies Sultan Darius as a non-runner in that race. This is a runner-status distinction, not an extra race or a race-count discrepancy.
 
-The snapshot was requested with both GB and IRE region codes, but returned only GB races. This is not evidence of a coverage failure: the independent fixture listings for 23 November show no Irish meeting. The Tuesday 24 November snapshot includes Tramore (7 Irish races), so Irish coverage is being tested on a date with an Irish fixture.
+The snapshot was requested with both GB and IRE region codes, but returned only GB races. This is not evidence of a coverage failure: independent fixture listings show no Irish meeting on 23 November.
+
+## Irish coverage check — Tuesday 24 November 2026
+
+The Tuesday snapshot includes Tramore (IRE), with **7 race records** at 12:45, 13:15, 13:45, 14:15, 14:45, 15:15, and 15:50. Racing Post independently lists Tramore with the same seven races and the same scheduled off-times. Irish Horse Racing and RaceWatch also show one Irish meeting and seven races for this date.
+
+This confirms that the free endpoint returned the Irish meeting when one was scheduled. It is a useful positive coverage check, but only one Irish meeting/date has been tested so far.
+
+The Tramore runner totals need careful interpretation: the API snapshot contains 106 runner objects across the seven races, while its advertised `field_size` values sum to 94. Independent listings updated later in the day report different runner totals as declarations and non-runner information change. Preserve the raw snapshot and treat runner-level reconciliation as a separate validation item; do not use raw runner-object counts as confirmed active field sizes.
 
 ## Discrepancies reviewed
 
@@ -38,23 +46,23 @@ The snapshot was requested with both GB and IRE region codes, but returned only 
 
 All six Wincanton races were marked abandoned by the API. The official Wincanton Racecourse notice confirmed that the Tuesday 24 November fixture was abandoned following a morning inspection. The API's abandoned status is therefore consistent with the official course notice. Some third-party racecard pages continued to display the original scheduled programme, which caused the apparent conflict.
 
-### Runner counts — explained
+### Runner counts — explained, with live-card reconciliation still required
 
 The difference between the sum of advertised `field_size` values (461) and the number of runner objects (475) in the Tuesday snapshot was traced to non-runners and reserves in the feed. Six races had a difference between `field_size` and the number of runner objects. Do not treat every runner object as a confirmed active runner; retain the provider's runner-level status and distinguish reserves, non-runners, and declared runners in downstream processing.
 
 The Monday snapshot shows the same principle on a specific race: Newcastle 16:40 has `field_size=7` and 8 runner objects, with Sultan Darius independently listed as a non-runner.
 
-### Race counts — comparison completed for this date, repeat test still required
+### Race counts — comparison completed for two dates
 
-| Course | API | Racecards.uk comparison | Racing Post comparison |
-|---|---:|---:|---:|
-| Lingfield | 9 | 9 | 8 |
-| Southwell | 8 | 8 | 7 |
-| Tramore | 7 | 7 | 7 |
-| Wolverhampton | 9 | 9 | 8 |
-| Wincanton | 6 | Fixture abandoned | 6 listed |
+| Course | Tuesday API | Tuesday published comparison |
+|---|---:|---:|
+| Lingfield | 9 | 9 |
+| Southwell | 8 | 8 |
+| Tramore (IRE) | 7 | 7 |
+| Wolverhampton | 9 | 9 |
+| Wincanton | 6 | Fixture abandoned |
 
-For the four active meetings, the API counts matched the Racecards.uk listing checked during this investigation. Racing Post showed one fewer race at Lingfield, Southwell, and Wolverhampton. This means the API's extra records are not established as errors; published listings can differ. Wincanton's six records represent an abandoned fixture, not six races to include in a live card.
+For Tuesday 24 November, the API's active-meeting race counts match the published listings checked for Lingfield, Southwell, Tramore, and Wolverhampton. Wincanton's six records represent an abandoned fixture, not six races to include in a live card. Earlier third-party listings differed on some counts, which is why source date and capture time must be recorded.
 
 The Monday 23 November snapshot independently matched published listings at all five active meetings: Bangor-on-Dee 7, Huntingdon 6, Kempton 7, Newcastle 9, and Wolverhampton 9 — 38 races total.
 
@@ -86,6 +94,6 @@ For each new test snapshot:
 
 ## Current conclusion
 
-The free feed is promising. The Wincanton abandonment, runner-count differences, and race-count comparisons have been investigated across two dates. **It is not yet validated for automatic predictor ingestion.** The next validation step is to continue checking a date with Irish fixtures and repeat the comparisons. Continue using the free tier; do not purchase a subscription for this investigation.
+The free feed is promising. Wincanton's abandonment, race-count differences, and the presence of an Irish meeting have now been checked across two dates. **It is not yet validated for automatic predictor ingestion.** The next validation step is to repeat the test on another date with Irish fixtures and improve runner-status reconciliation. Continue using the free tier; do not purchase a subscription for this investigation.
 
 The free racecard endpoint is a racecard source only. Do not infer odds, expected value, or a profitable betting edge from it.
