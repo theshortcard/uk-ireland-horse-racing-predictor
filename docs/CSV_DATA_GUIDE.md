@@ -19,7 +19,9 @@ The templates include optional audit fields:
 - `retrieved_at`: when the record was obtained, as an ISO 8601 timestamp including timezone.
 - `odds_source`: bookmaker or exchange that displayed the price.
 - `odds_captured_at`: when that exact price was observed, as an ISO 8601 timestamp including timezone.
-- `finish_position`: official finishing position for historical records.
+- `finish_position`: official finishing position for historical records; tied winners may share position `1`.
+- `runner_status`: use `RUNNER` or `NON_RUNNER` (also accepts `NR`, `WITHDRAWN`, and `SCRATCHED`). Keep withdrawn runners in the file for audit; they are excluded from model predictions and ROI.
+- `result_status`: use `COMPLETED`, `VOID`, `ABANDONED`, or `INCOMPLETE`. Blank values are treated as completed for backwards compatibility.
 - `result_source`: official or otherwise permitted result source.
 - `result_verified_at`: when the result was checked, including timezone.
 
@@ -28,8 +30,10 @@ Do not enter a guessed timestamp. If a source does not provide a field, leave it
 ## Historical data rules
 
 - Enter actual results only; never copy the fictional examples into a real training dataset.
-- Keep all runners in a race, including non-runners if the source records them, and document status in a separate notes/source file until explicit non-runner settlement is implemented.
-- The current backtest only evaluates races with exactly one winner. Exclude dead heats, voids, abandoned races, and incomplete results.
+- Keep all runners in a race, including non-runners, and mark withdrawn runners with `runner_status=NON_RUNNER`.
+- Multiple runners with `finish_position=1` are treated as a dead heat. The backtest splits the winning return across tied winners (decimal odds divided by the number of tied winners).
+- Mark void or abandoned races with `result_status=VOID` or `ABANDONED`; they are skipped. Incomplete races are also skipped and counted in the report.
+- Result status and finish position are settlement/evaluation fields only; they must never be used as pre-race model inputs.
 - Keep source terms and permission records. Publicly viewable does not automatically mean permitted for bulk collection, storage, or model training.
 
 ## Current model limitation
