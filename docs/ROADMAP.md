@@ -14,7 +14,7 @@
 
 ## Phase 2 — evaluation
 - [x] Historical backtest framework
-- [x] Top-pick hit rate, multiclass Brier score and log loss
+- [x] Top-pick hit rate, multiclass Brier score, log loss and expected calibration error
 - [x] Flat-stake ROI where valid pre-race prices are supplied
 - [x] Add dead-heat, void-race and non-runner settlement rules
 - [x] Add market benchmark comparisons (normalized implied probabilities; complete-price races only)
@@ -33,7 +33,7 @@
 - [ ] Build leakage-safe historical dataset
 - [ ] Establish market and rating baselines
 - [ ] Add course, distance, going, class, trainer, and jockey features when data supports them
-- [ ] Evaluate log loss, Brier score, calibration, and ROI out of sample
+- [ ] Evaluate log loss, Brier score, calibration, and ROI out of sample on a sufficiently large real dataset
 - [ ] Only promote models that outperform baselines
 
 ## Phase 5 — daily operation
