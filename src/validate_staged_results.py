@@ -21,7 +21,7 @@ REQUIRED = {
 }
 NON_FINISH_CODES = {
     "PU", "UR", "F", "BD", "RO", "SU", "REF", "DSQ", "CO", "L",
-    "RR", "VOID", "NR", "B", "U", "S",
+    "RR", "VOID", "NR", "B", "U", "S", "LFT",
 }
 
 
@@ -123,7 +123,9 @@ def audit_file(input_path: Path) -> dict:
                     code = (row.get("source_finish_code") or "").strip().upper()
                     if code:
                         finish_codes[code] += 1
-                        if code not in NON_FINISH_CODES:
+                        if code == "-":
+                            counts["missing_finish_outcome"] += 1
+                        elif code not in NON_FINISH_CODES:
                             counts["unrecognised_finish_code"] += 1
                     else:
                         counts["missing_finish_outcome"] += 1
