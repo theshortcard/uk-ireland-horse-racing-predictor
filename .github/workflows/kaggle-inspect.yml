@@ -1,0 +1,105 @@
+name: Inspect Kaggle historical archive
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out predictor
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Kaggle CLI
+        run: python -m pip install --upgrade kaggle
+
+      - name: Download and inspect archive structure
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${KAGGLE_USERNAME}" ] || [ -z "${KAGGLE_KEY}" ]; then
+            echo "::error::Add KAGGLE_USERNAME and KAGGLE_KEY as repository Actions secrets first."
+            exit 1
+          fi
+
+          mkdir -p "$RUNNER_TEMP/kaggle"
+          mkdir -p "$HOME/.kaggle"
+          printf '{"username":"%s","key":"%s"}' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > "$HOME/.kaggle/kaggle.json"
+          chmod 600 "$HOME/.kaggle/kaggle.json"
+
+          kaggle datasets metadata -d delt ar omeo/horse-racing-results-ukireland-2015-2025 -p "$RUNNER_TEMP/kaggle" || true
+          kaggle datasets download -d delt ar omeo/horse-racing-results-ukireland-2015-2025 -p "$RUNNER_TEMP/kaggle" --unzip
+
+          echo "=== Downloaded file inventory (raw data is not uploaded or committed) ==="
+          find "$RUNNER_TEMP/kaggle" -type f -printf '%P | %s bytes\n' | sort
+
+          python - "$RUNNER_TEMP/kaggle" <<'PY'
+          import csv
+          import json
+          import sqlite3
+          import sys
+          from pathlib import Path
+
+          root = Path(sys.argv[1])
+          metadata = root / "dataset-metadata.json"
+          if metadata.exists():
+              print("\n=== Kaggle dataset metadata ===")
+              try:
+                  data = json.loads(metadata.read_text(encoding="utf-8"))
+                  for key in ("title", "id", "licenses", "licensesName", "subtitle", "description"):
+                      if key in data:
+                          value = str(data[key]).replace("\n", " ")
+                          print(f"{key}: {value[:1000]}")
+              except Exception as exc:
+                  print(f"Metadata could not be parsed: {exc}")
+
+          csv_files = sorted(p for p in root.rglob("*.csv") if p.is_file())
+          print(f"\n=== CSV files found: {len(csv_files)} ===")
+          for path in csv_files:
+              print(f"\nCSV: {path.relative_to(root)} ({path.stat().st_size} bytes)")
+              try:
+                  with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as handle:
+                      sample = handle.read(8192)
+                      handle.seek(0)
+                      try:
+                          dialect = csv.Sniffer().sniff(sample, delimiters=",;|\t")
+                      except csv.Error:
+                          dialect = csv.excel
+                      reader = csv.reader(handle, dialect)
+                      header = next(reader, [])
+                      first = next(reader, [])
+                  print("HEADER:", json.dumps(header, ensure_ascii=False))
+                  print("FIRST DATA ROW:", json.dumps(first[:40], ensure_ascii=False))
+              except Exception as exc:
+                  print(f"CSV inspection failed: {type(exc).__name__}: {exc}")
+
+          db_files = sorted(p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in {".db", ".sqlite", ".sqlite3"})
+          print(f"\n=== SQLite files found: {len(db_files)} ===")
+          for path in db_files:
+              print(f"\nDATABASE: {path.relative_to(root)} ({path.stat().st_size} bytes)")
+              try:
+                  connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+                  tables = connection.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
+                  for (table,) in tables:
+                      columns = connection.execute(f'PRAGMA table_info("{table}")').fetchall()
+                      print(f"TABLE {table}: " + ", ".join(column[1] for column in columns))
+                  connection.close()
+              except Exception as exc:
+                  print(f"Database inspection failed: {type(exc).__name__}: {exc}")
+
+          if not csv_files and not db_files:
+              print("\nWARNING: No CSV or SQLite data file was found; review the inventory above.")
+          PY
+
+          rm -f "$HOME/.kaggle/kaggle.json"
