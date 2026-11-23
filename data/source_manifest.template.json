@@ -1,0 +1,14 @@
+{
+  "dataset_name": "REPLACE_WITH_DATASET_NAME",
+  "provider": "REPLACE_WITH_PROVIDER_OR_AUTHOR",
+  "source_url": "https://example.com/dataset",
+  "license_name": "REPLACE_WITH_EXACT_LICENSE_NAME",
+  "license_url": "https://example.com/license",
+  "downloaded_at": "2026-11-23T12:00:00Z",
+  "file_path": "data/external/your_dataset.csv",
+  "sha256": "REPLACE_WITH_64_CHARACTER_SHA256",
+  "coverage_start": "1988-01-01",
+  "coverage_end": "2026-11-20",
+  "countries": ["GB", "IRE"],
+  "notes": "Record the source's stated provenance, known limitations, and any required attribution."
+}
