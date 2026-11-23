@@ -6,7 +6,6 @@ post-race finish_position column. The model never reads finish_position.
 from __future__ import annotations
 
 import argparse
-import csv
 import math
 from collections import defaultdict
 from pathlib import Path
@@ -15,12 +14,20 @@ from .io_utils import read_racecard, validate_racecard
 from .model import predict_race
 
 
+def _race_key(row: dict[str, str]) -> tuple[str, str, str, str, str]:
+    """Build a race identity that remains safe when source race IDs are reused."""
+    return tuple(
+        (row.get(field) or "").strip().casefold()
+        for field in ("date", "course", "off_time", "country", "race_id")
+    )
+
+
 def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
     """Evaluate one-winner-per-race records using pre-race fields only."""
-    groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    groups: dict[tuple[str, str, str, str, str], list[dict[str, str]]] = defaultdict(list)
     for row in rows:
         if (row.get("finish_position") or "").strip():
-            groups[row.get("race_id", "")].append(row)
+            groups[_race_key(row)].append(row)
 
     race_count = 0
     brier_total = 0.0
@@ -28,7 +35,6 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
     top_hits = 0
     roi_profit = 0.0
     roi_bets = 0
-    odds_bets = 0
 
     for runners in groups.values():
         winners = [
@@ -38,8 +44,7 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
         if len(winners) != 1:
             continue
 
-        # predict_race uses only its declared pre-race feature fields;
-        # finish_position is carried through but is not a model input.
+        # finish_position is carried through but is never used as a model input.
         predictions = predict_race(runners)
         probability_by_horse = {
             str(item.get("horse", "")).casefold(): float(item["win_probability"])
@@ -57,19 +62,18 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
         )
         logloss_total += -math.log(max(winner_probability, 1e-15))
         top_pick = predictions[0]
-        if str(top_pick.get("horse", "")).casefold() == winner_key:
+        top_pick_won = str(top_pick.get("horse", "")).casefold() == winner_key
+        if top_pick_won:
             top_hits += 1
 
-        # Flat 1-unit bet on model top pick, only when the CSV contains
-        # a valid decimal price that was recorded before the race.
+        # Flat 1-unit bet on model top pick, only with valid decimal odds.
         try:
             odds = float(top_pick.get("odds_decimal") or "")
         except (TypeError, ValueError):
             odds = 0.0
-        if odds > 1.0:
+        if math.isfinite(odds) and odds > 1.0:
             roi_bets += 1
-            odds_bets += 1
-            roi_profit += odds - 1.0 if str(top_pick.get("horse", "")).casefold() == winner_key else -1.0
+            roi_profit += odds - 1.0 if top_pick_won else -1.0
 
     if not race_count:
         raise ValueError("No evaluable races: each race must have exactly one runner with finish_position=1.")
@@ -80,7 +84,7 @@ def evaluate(rows: list[dict[str, str]]) -> dict[str, float | int | None]:
         "mean_multiclass_brier": brier_total / race_count,
         "mean_log_loss": logloss_total / race_count,
         "flat_stake_bets_with_odds": roi_bets,
-        "flat_stake_profit_units": roi_profit if odds_bets else None,
+        "flat_stake_profit_units": roi_profit if roi_bets else None,
         "flat_stake_roi": roi_profit / roi_bets if roi_bets else None,
     }
 
@@ -116,6 +120,7 @@ def main() -> int:
         "- Every feature and price must have been recorded before the race started.",
         "- Results must be official and each evaluated race must have exactly one winner row.",
         "- Exclude void races, dead heats, abandoned races, and incomplete result records until explicit settlement handling is implemented.",
+        "- Race identity uses date, course, off time, country, and race ID so reused source IDs do not merge separate races.",
         "- Do not use closing odds or post-race fields as model inputs.",
         "",
     ]
