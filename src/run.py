@@ -12,6 +12,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Generate a UK/Irish horse racing baseline report.")
     parser.add_argument("--input", default="data/sample_racecard.csv", help="Path to racecard CSV")
     parser.add_argument("--output", default="reports/daily_report.md", help="Path for Markdown report")
+    parser.add_argument("--allow-blocked-provenance", action="store_true", help="Allow report generation to finish when provenance is blocked; market edge and EV remain suppressed")
     args = parser.parse_args()
 
     rows = read_racecard(args.input)
@@ -28,7 +29,9 @@ def main() -> int:
 
     if provenance_issues:
         print(f"PRICE PROVENANCE GATE BLOCKED: {len(provenance_issues)} issue(s). Market edge and EV are suppressed.")
-        return 1
+        if not args.allow_blocked_provenance:
+            return 1
+        print("Continuing because --allow-blocked-provenance was explicitly supplied; no market edge or EV is published.")
 
     print("Price provenance checks passed. Market comparisons may be shown only for complete priced fields.")
     if validation_issues:
