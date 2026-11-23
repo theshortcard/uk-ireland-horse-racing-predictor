@@ -129,3 +129,29 @@ Open data and attribution: https://kickthebookies.com/open-data/
 ### Licensing interpretation and integration gate
 
 A dataset being downloadable without payment is not the same as being unrestricted. Before integration, confirm the exact dataset version, licence attached to that version, source acknowledgements, field definitions, and whether any upstream restrictions are disclosed. Do not redistribute raw or enhanced CDLA-Sharing data unless the project can comply with the same licence and attribution conditions. Model-derived computational results are treated separately under the CDLA terms.
+
+### RacingAPI.net vs Horse Racing API UK — two different services
+
+These similarly named services must not be conflated:
+
+- **RacingAPI.net** advertises a seven-day trial, not a permanent free tier. Checkout requires a payment card and renews automatically unless cancelled. Its Developer subscription is listed at £29/month. It covers combined UK and Irish feeds, including racecards, results, historical requests and supplied bookmaker odds. It remains outside the £0 budget unless the provider grants no-cost access in writing.
+- **Horse Racing API UK** at https://horseracingapi.co.uk/ documents a genuinely free key, but it is limited to yesterday's results, 50 calls per month, and coverage of Great Britain and Northern Ireland only. The documentation says prices are null on the free key; the Republic of Ireland is not included. It is therefore useful only for a small UK-result cross-check, not as the project's complete UK/IRE source or a pre-race odds feed.
+
+Documentation: https://racingapi.net/docs
+Free-key documentation: https://horseracingapi.co.uk/documentation
+
+### RPScrape / Racing Post scraping — technical candidate, rights and reliability blocked
+
+We reviewed the original RPScrape project and its community continuation.
+
+- The original tool was designed to scrape historical horse-racing results into CSV and its examples include Great Britain (gb) and Ireland (ire).
+- The current community fork says Racing Post changed its delivery method, deprecated the prior public data API, and moved JSON into page HTML. It also reports IP blocking when requests are too aggressive and adds conservative rate limiting.
+- The fork explicitly says the original joenano/rpscrape repository had no licence. Its MIT licence covers only changes made in the fork after it diverged; it does not grant rights to the original code or to Racing Post's underlying data.
+- Racing Post's published terms state that site and interactive-service use is personal and non-commercial, and that other reproduction, modification, distribution or republication requires prior written permission. The public terms reviewed do not give this project a clear permission for automated bulk extraction, long-term data warehousing, or model training.
+- The scraper's ability to collect a page is not proof that the resulting records can lawfully or contractually be retained and used for model development. Nor does a GitHub code licence grant rights to source-site content.
+- Decision: keep RPScrape as a research lead only. Do not add it to GitHub Actions, run bulk scraping, collect Racing Post credentials/cookies, or train on its output unless Racing Post provides written permission covering automated access, storage, historical model training, and intended outputs. If permission is obtained, separately audit completeness, missing runners, result status, field definitions, rate limits and timestamp provenance before use.
+
+Projects and terms:
+- Original scraper: https://github.com/robinhowlett/rpscrape
+- Community continuation: https://github.com/Eatkin/rpscrape-community
+- Racing Post terms: https://help.racingpost.com/hc/en-us/articles/208996085-Terms-and-conditions
