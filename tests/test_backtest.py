@@ -1,6 +1,6 @@
 import pytest
 
-from src.backtest import evaluate
+from src.backtest import chronological_split, evaluate
 
 
 def test_backtest_metrics_and_flat_stake_roi():
@@ -109,3 +109,26 @@ def test_market_benchmark_skips_races_with_missing_runner_prices():
     assert result["market_benchmark_races"] == 0
     assert result["market_mean_multiclass_brier"] is None
     assert result["market_flat_stake_roi"] is None
+
+
+def test_chronological_split_keeps_whole_dates_in_holdout():
+    rows = [
+        {"date": "2026-01-01", "race_id": "A", "horse": "A1"},
+        {"date": "2026-01-01", "race_id": "A", "horse": "A2"},
+        {"date": "2026-01-02", "race_id": "B", "horse": "B1"},
+        {"date": "2026-01-03", "race_id": "C", "horse": "C1"},
+    ]
+    training, holdout = chronological_split(rows, test_fraction=0.34)
+    assert {row["date"] for row in training} == {"2026-01-01", "2026-01-02"}
+    assert {row["date"] for row in holdout} == {"2026-01-03"}
+    assert len(training) + len(holdout) == len(rows)
+
+
+def test_chronological_split_rejects_single_date():
+    with pytest.raises(ValueError, match="at least two distinct race dates"):
+        chronological_split([{"date": "2026-01-01"}])
+
+
+def test_chronological_split_rejects_invalid_fraction():
+    with pytest.raises(ValueError, match="test_fraction"):
+        chronological_split([{"date": "2026-01-01"}, {"date": "2026-01-02"}], 1.0)
