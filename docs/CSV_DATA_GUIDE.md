@@ -9,7 +9,7 @@ Use the blank templates in `data/` when entering real race information:
 
 `race_id,date,course,country,off_time,horse,horse_age,official_rating,odds_decimal`
 
-Use `GB` for Great Britain and `IRE` for Ireland. Use a stable race identifier that is unique for each race on a date (for example, a source-provided race ID). Keep horse names consistent within each race. Decimal odds must be greater than 1.0; leave them blank when no verified price is available.
+Use `GB` for Great Britain and `IRE` for Ireland. Use a stable race identifier that is unique for each race on a date (for example, a source-provided race ID). Keep horse names consistent within each race. Decimal odds must be greater than 1.0; leave them blank when no verified price is available. If supplied, `days_since_run` must be a finite, nonnegative number.
 
 ## Provenance fields
 
