@@ -114,14 +114,14 @@ Workflow run `45302806570`, artifact `theracingapi-free-racecard-tomorrow`, retr
 
 The API returned eight Dundalk races at 14:01, 14:31, 15:01, 15:31, 16:06, 16:40, 17:10, and 17:40. Racing Post and Racing TV independently list the same eight races and times for 25 November. IrishRacing displays the same fixture beginning at 14:01 on its alternate date URL; its other indexed page appears to show 14:31 as the first race, which explains the earlier apparent seven-race count. The 14:01 race is not missing from the API feed.
 
-### Dundalk runner objects — reserves identified
+### Dundalk runner objects — reconciliation pending independent recheck
 
-The API supplies `field_size` as a numeric string (for example, `"14"`), not an integer. The first audit version therefore failed to include those values in its numeric sum or mismatch check. The audit code has now been corrected to parse numeric strings and identify reserve runners by runner number beginning with `R`.
+The API supplies `field_size` as a numeric string (for example, `"14"`), not an integer. The audit code has been corrected to parse numeric strings and to flag reserve runners by runner number beginning with `R`.
 
-In six Dundalk races, the raw runner-object count exceeds `field_size` by 1 to 3. The additional records are explicitly numbered reserves (R15, R16, R17), not additional declared starters. After excluding reserve entries, the declared-runner counts match the advertised field sizes in all 40 races in this snapshot. Total runner objects: 461; reserve records: 9; declared runner objects excluding reserves: 452.
+The current documentation previously recorded a reserve-based reconciliation for this snapshot. That detailed runner-level result still needs to be independently rerun against the raw Wednesday artifact before it is treated as confirmed. Until then, retain the raw count of 461 runner objects and the advertised field-size sum of 452 as separate figures; do not assume the nine-record difference is fully explained by reserves.
 
-The audit tests now include numeric-string field sizes and reserve exclusion. The new test changes are committed; their latest automated test run must complete successfully before treating the revised checks as verified.
+Automated tests covering numeric-string field sizes and reserve exclusion have since completed successfully. A green test run confirms the audit logic passes its test cases; it does not, by itself, verify the contents of this particular downloaded snapshot.
 
 ## Current conclusion update
 
-The third snapshot provides a second positive Irish coverage check (Dundalk, eight races) and resolves the earlier Dundalk seven-versus-eight race-count discrepancy. It also demonstrates why reserves must be distinguished from active declarations. Continue collecting dated snapshots; do not integrate the feed into the predictor until the revised tests pass and several more dates reconcile.
+The third snapshot provides a second positive Irish coverage check (Dundalk, eight races) and resolves the earlier Dundalk seven-versus-eight race-count discrepancy. The revised automated tests are green, but the Wednesday runner-level reconciliation still requires a fresh audit of the raw artifact. Continue collecting dated snapshots; do not integrate the feed into the predictor until runner statuses are verified against real snapshots and several more dates reconcile.
