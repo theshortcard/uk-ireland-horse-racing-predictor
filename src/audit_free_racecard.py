@@ -33,6 +33,8 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
     course_time_counts = Counter(course_time_keys)
 
     runner_objects = 0
+    reserve_runner_objects = 0
+    declared_runner_objects = 0
     empty_runner_races = 0
     field_size_sum = 0
     field_size_known = 0
@@ -44,6 +46,14 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(runners, list):
             runners = []
         runner_objects += len(runners)
+        reserves = [
+            runner for runner in runners
+            if isinstance(runner, dict)
+            and str(runner.get("number", "")).strip().upper().startswith("R")
+        ]
+        active_runners = [runner for runner in runners if runner not in reserves]
+        reserve_runner_objects += len(reserves)
+        declared_runner_objects += len(active_runners)
         if not runners:
             empty_runner_races += 1
 
@@ -55,13 +65,14 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
         if field_size is not None:
             field_size_sum += field_size
             field_size_known += 1
-            if field_size != len(runners):
+            if field_size != len(active_runners):
                 field_size_mismatches.append({
                     "course": race.get("course"),
                     "date": race.get("date"),
                     "off_time": race.get("off_time"),
                     "field_size": field_size,
-                    "runner_objects": len(runners),
+                    "declared_runner_objects": len(active_runners),
+                    "all_runner_objects_including_reserves": len(runners),
                 })
 
         names = [str(x.get("horse", "")).strip().casefold()
@@ -88,6 +99,8 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "courses": dict(sorted(courses.items())),
         "race_statuses": dict(sorted(statuses.items())),
         "runner_objects": runner_objects,
+        "declared_runner_objects_excluding_reserves": declared_runner_objects,
+        "reserve_runner_objects": reserve_runner_objects,
         "empty_runner_races": empty_runner_races,
         "field_size_sum": field_size_sum,
         "field_size_known_races": field_size_known,
