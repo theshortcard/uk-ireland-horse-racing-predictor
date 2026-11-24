@@ -55,3 +55,23 @@ def test_audit_rejects_missing_racecards_list():
         assert "racecards" in str(exc)
     else:
         raise AssertionError("Expected ValueError")
+
+
+
+def test_audit_parses_provider_field_size_strings():
+    payload = {
+        "racecards": [{
+            "race_id": "r1", "date": "2026-11-25", "course": "Dundalk",
+            "off_time": "2:31", "region": "ire", "race_status": "declared",
+            "field_size": "14",
+            "runners": [{"horse": f"Horse {i}"} for i in range(15)],
+        }]
+    }
+    report = audit_payload(payload)
+
+    assert report["field_size_sum"] == 14
+    assert report["field_size_known_races"] == 1
+    assert report["field_size_runner_object_mismatches"] == [{
+        "course": "Dundalk", "date": "2026-11-25", "off_time": "2:31",
+        "field_size": 14, "runner_objects": 15,
+    }]
