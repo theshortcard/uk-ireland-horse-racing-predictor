@@ -97,3 +97,31 @@ For each new test snapshot:
 The free feed is promising. Wincanton's abandonment, race-count differences, and the presence of an Irish meeting have now been checked across two dates. **It is not yet validated for automatic predictor ingestion.** The next validation step is to repeat the test on another date with Irish fixtures and improve runner-status reconciliation. Continue using the free tier; do not purchase a subscription for this investigation.
 
 The free racecard endpoint is a racecard source only. Do not infer odds, expected value, or a profitable betting edge from it.
+
+
+## Third snapshot — Wednesday 25 November 2026
+
+Workflow run `45302806570`, artifact `theracingapi-free-racecard-tomorrow`, retrieved at `2026-11-24T01:09:04.400474Z`, HTTP 200.
+
+- **40 race records** and **461 runner objects**
+- All 40 records dated 25 November 2026
+- **32 GB** and **8 IRE** race records
+- Five venues: Hereford (7), Kempton (9), Newcastle (9), Wetherby (7), and Dundalk (8)
+- All 40 records marked declared; 40 unique race IDs; no duplicate course/off-time keys; no empty runner arrays
+- Advertised field sizes sum to **452** across all 40 races
+
+### Dundalk race-count discrepancy — resolved
+
+The API returned eight Dundalk races at 14:01, 14:31, 15:01, 15:31, 16:06, 16:40, 17:10, and 17:40. Racing Post and Racing TV independently list the same eight races and times for 25 November. IrishRacing displays the same fixture beginning at 14:01 on its alternate date URL; its other indexed page appears to show 14:31 as the first race, which explains the earlier apparent seven-race count. The 14:01 race is not missing from the API feed.
+
+### Dundalk runner objects — reserves identified
+
+The API supplies `field_size` as a numeric string (for example, `"14"`), not an integer. The first audit version therefore failed to include those values in its numeric sum or mismatch check. The audit code has now been corrected to parse numeric strings and identify reserve runners by runner number beginning with `R`.
+
+In six Dundalk races, the raw runner-object count exceeds `field_size` by 1 to 3. The additional records are explicitly numbered reserves (R15, R16, R17), not additional declared starters. After excluding reserve entries, the declared-runner counts match the advertised field sizes in all 40 races in this snapshot. Total runner objects: 461; reserve records: 9; declared runner objects excluding reserves: 452.
+
+The audit tests now include numeric-string field sizes and reserve exclusion. The new test changes are committed; their latest automated test run must complete successfully before treating the revised checks as verified.
+
+## Current conclusion update
+
+The third snapshot provides a second positive Irish coverage check (Dundalk, eight races) and resolves the earlier Dundalk seven-versus-eight race-count discrepancy. It also demonstrates why reserves must be distinguished from active declarations. Continue collecting dated snapshots; do not integrate the feed into the predictor until the revised tests pass and several more dates reconcile.
