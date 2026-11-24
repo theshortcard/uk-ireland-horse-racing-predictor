@@ -31,7 +31,7 @@ def test_audit_counts_races_regions_and_runner_mismatches():
     assert report["empty_runner_races"] == 1
     assert report["field_size_sum"] == 7
     assert report["field_size_runner_object_mismatches"][0]["field_size"] == 7
-    assert report["field_size_runner_object_mismatches"][0]["runner_objects"] == 2
+    assert report["field_size_runner_object_mismatches"][0]["declared_runner_objects"] == 2
 
 
 def test_audit_flags_duplicate_race_identity_and_course_time():
@@ -73,5 +73,27 @@ def test_audit_parses_provider_field_size_strings():
     assert report["field_size_known_races"] == 1
     assert report["field_size_runner_object_mismatches"] == [{
         "course": "Dundalk", "date": "2026-11-25", "off_time": "2:31",
-        "field_size": 14, "runner_objects": 15,
+        "field_size": 14, "declared_runner_objects": 15,
+        "all_runner_objects_including_reserves": 15,
     }]
+
+
+
+def test_audit_excludes_reserve_entries_from_declared_field_comparison():
+    payload = {
+        "racecards": [{
+            "race_id": "r1", "date": "2026-11-25", "course": "Dundalk",
+            "off_time": "2:31", "region": "ire", "race_status": "declared",
+            "field_size": "14",
+            "runners": (
+                [{"number": str(i), "horse": f"Horse {i}"} for i in range(1, 15)]
+                + [{"number": "R15", "horse": "Reserve Horse"}]
+            ),
+        }]
+    }
+    report = audit_payload(payload)
+
+    assert report["runner_objects"] == 15
+    assert report["declared_runner_objects_excluding_reserves"] == 14
+    assert report["reserve_runner_objects"] == 1
+    assert report["field_size_runner_object_mismatches"] == []
