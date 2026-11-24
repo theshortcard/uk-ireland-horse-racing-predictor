@@ -47,8 +47,12 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
         if not runners:
             empty_runner_races += 1
 
-        field_size = race.get("field_size")
-        if isinstance(field_size, int) and not isinstance(field_size, bool):
+        raw_field_size = race.get("field_size")
+        try:
+            field_size = int(raw_field_size) if raw_field_size not in (None, "") else None
+        except (TypeError, ValueError):
+            field_size = None
+        if field_size is not None:
             field_size_sum += field_size
             field_size_known += 1
             if field_size != len(runners):
