@@ -151,3 +151,11 @@ The 16:30 race therefore appears to be a genuine scheduled race, not simply an A
 The other four course counts agree across the API audit and the independent listings checked: Lingfield 6, Market Rasen 7, Taunton 6, and Thurles 7.
 
 The Thursday snapshot is a strong positive UK-and-Ireland coverage check. Chelmsford's count is provisionally explained by the detailed racecard evidence, but raw-record matching and direct inspection of the five reserve records remain outstanding. Keep the free tier and continue manual validation. The snapshot contains no odds and does not establish expected value or betting profitability.
+
+### Chelmsford follow-up — detailed racecards support nine races
+
+A further source check strengthens the explanation above. Racing Post's individual 26 November Chelmsford card explicitly shows the 16:30 Midnite A Next Generation Betting App Handicap (14 runners), followed by the 17:00 and later races. Betfred's individual 16:30 racecard also lists the same race and 14 runners. RaceTrends lists all nine Chelmsford races from 16:30 through 20:30, and Racecards.uk independently lists the 16:30 race with the same 14 named runners.
+
+This detailed race-level evidence supports **nine scheduled Chelmsford races**. The racecourse's own event summary still says first race 17:00 and eight races, so its summary conflicts with the detailed racecard listings. The most likely explanation is that the event summary is stale or inconsistent. The API's Chelmsford count of nine is therefore provisionally supported by multiple detailed racecard sources, although direct matching of the raw API race IDs, off-times, and titles remains outstanding.
+
+Sources checked: Racing Post individual Chelmsford card; Betfred individual 16:30 card; RaceTrends dated card; Racecards.uk individual 16:30 card; Chelmsford City Racecourse event summary. This source check validates the published schedule evidence, not the exact contents of the API's raw Chelmsford records.
