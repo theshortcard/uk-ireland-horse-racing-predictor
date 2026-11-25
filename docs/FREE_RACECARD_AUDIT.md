@@ -159,3 +159,18 @@ A further source check strengthens the explanation above. Racing Post's individu
 This detailed race-level evidence supports **nine scheduled Chelmsford races**. The racecourse's own event summary still says first race 17:00 and eight races, so its summary conflicts with the detailed racecard listings. The most likely explanation is that the event summary is stale or inconsistent. The API's Chelmsford count of nine is therefore provisionally supported by multiple detailed racecard sources, although direct matching of the raw API race IDs, off-times, and titles remains outstanding.
 
 Sources checked: Racing Post individual Chelmsford card; Betfred individual 16:30 card; RaceTrends dated card; Racecards.uk individual 16:30 card; Chelmsford City Racecourse event summary. This source check validates the published schedule evidence, not the exact contents of the API's raw Chelmsford records.
+
+### Repeat capture — 26 November card, 25 November at 06:43 UTC
+
+A second free-tier request for the same target date completed successfully in workflow run `45562683304` (artifact ID `14998477515`). The fetch log records the raw snapshot as `racecards_tomorrow_20261125T064319Z.json`; the audit ran successfully and printed the following results:
+
+- **35 races**, all dated 26 November 2026: 28 GB and 7 IRE
+- Course counts unchanged: Chelmsford (AW) 9, Lingfield 6, Market Rasen 7, Taunton 6, Thurles 7
+- All 35 races marked declared; 35 unique race IDs; no missing IDs or duplicate race/course-off-time keys
+- **360 runner objects**, of which the audit classified 5 as reserves and 355 as declared
+- Advertised field-size sum **355**, with no field-size/declared-runner mismatches
+- No empty runner arrays or duplicate runner names
+
+This repeat capture was made about 5 hours 20 minutes after the earlier 01:23 UTC capture and produced the same headline counts. It provides a useful consistency check for the card during that interval. It is not an independent date or an independent provider, and it does not replace inspection of the five individual reserve records or matching each raw Chelmsford record to the detailed published card. The workflow log exposes the audit summary, not the full raw race-by-race JSON.
+
+Artifact digest: `sha256:094a9d4827136516de613a98b3aaf4d401ecbd98a749713da950b27de7d456ad`.
