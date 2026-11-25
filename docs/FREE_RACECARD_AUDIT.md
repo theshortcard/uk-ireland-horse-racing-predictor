@@ -125,3 +125,27 @@ Automated tests covering numeric-string field sizes and reserve exclusion have s
 ## Current conclusion update
 
 The third snapshot provides a second positive Irish coverage check (Dundalk, eight races) and resolves the earlier Dundalk seven-versus-eight race-count discrepancy. The revised automated tests are green, but the Wednesday runner-level reconciliation still requires a fresh audit of the raw artifact. Continue collecting dated snapshots; do not integrate the feed into the predictor until runner statuses are verified against real snapshots and several more dates reconcile.
+
+## Fourth snapshot — Thursday 26 November 2026
+
+Workflow run `45525315753`, artifact `theracingapi-free-racecard-tomorrow`, retrieved at `2026-11-25T01:23:03.336237Z`, HTTP 200. Snapshot SHA-256: `841c78f6af698ed07b8a30c4a336cc5b9b6df29dfe8099c1e0cd2826d161ae61`.
+
+The workflow's saved audit report records:
+
+- **35 race records**: **28 GB** and **7 IRE**
+- Five courses: Chelmsford (AW) (9), Lingfield (6), Market Rasen (7), Taunton (6), and Thurles (7)
+- All 35 records dated 26 November and marked declared
+- 35 unique race IDs; no missing IDs, duplicate IDs, or duplicate course/off-time keys
+- **360 runner objects**, including **5 records classified as reserves** by the audit rule (runner number beginning with `R`)
+- **355 declared runner objects** after excluding those reserves; advertised field sizes sum to **355**
+- No empty runner arrays, duplicate runner names, or field-size/declared-runner mismatches
+
+The reserve classification is an audit-rule result. The five underlying runner records still require direct per-race inspection before their status can be treated as independently confirmed.
+
+### Chelmsford race-count discrepancy — unresolved
+
+The API audit reports **9 Chelmsford races**, while Racing Post, Betfred, and HorseRacing.net list **8**. Oddschecker lists 9 and includes a 16:30 race, whereas the other listings checked begin at 17:00. The other four course counts agree across the API audit and the independent listings checked: Lingfield 6, Market Rasen 7, Taunton 6, and Thurles 7.
+
+The raw Chelmsford records must be inspected to identify the API's ninth entry and compare its off-time and race identity with the dated published cards. Until that is done, treat Chelmsford as an unresolved possible overcount; do not silently drop or accept the extra record.
+
+The Thursday snapshot is a strong positive UK-and-Ireland coverage check, but it is not yet cleared for predictor ingestion. Keep the free tier and continue manual validation. The snapshot contains no odds and does not establish expected value or betting profitability.
