@@ -174,3 +174,20 @@ A second free-tier request for the same target date completed successfully in wo
 This repeat capture was made about 5 hours 20 minutes after the earlier 01:23 UTC capture and produced the same headline counts. It provides a useful consistency check for the card during that interval. It is not an independent date or an independent provider, and it does not replace inspection of the five individual reserve records or matching each raw Chelmsford record to the detailed published card. The workflow log exposes the audit summary, not the full raw race-by-race JSON.
 
 Artifact digest: `sha256:094a9d4827136516de613a98b3aaf4d401ecbd98a749713da950b27de7d456ad`.
+
+### Friday 27 November 2026 — repeatable cross-region coverage test
+
+Workflow run `45765357856` completed successfully. Artifact ID `15091417840`; raw snapshot `racecards_tomorrow_20261126T060134Z.json`; captured 26 November 2026 at 06:01:34 UTC. The workflow audit summary reports:
+
+- **38 races** dated 27 November 2026: 31 GB and 7 IRE
+- Course counts: Doncaster 7, Dundalk (AW) 7, Musselburgh 7, Newbury 8, Southwell (AW) 9
+- All 38 races marked declared; 38 unique race IDs; no missing IDs, duplicate IDs, or duplicate course/off-time keys
+- **344 runner objects**: 338 classified as declared and 6 classified as reserves
+- Advertised field-size sum 338 across all 38 races; no field-size/declared-runner mismatches
+- No empty runner arrays or duplicate runner names
+
+The 38-race total and course counts match the detailed Racing Post listing and another detailed racecard listing (Newbury 8, Southwell 9, Doncaster 7, Musselburgh 7, Dundalk 7). A live declaration tracker at an earlier update showed only 36 races, explicitly noting that four races were still awaiting declarations; its provisional counts were Newbury 7 and Southwell 8. This is consistent with a timing/declaration-state difference rather than evidence of missing API meetings. The tracker is dynamic, so the time of comparison matters.
+
+This validates a further date with both GB and Irish coverage at the meeting-count level. It does not independently verify the six reserve classifications or every raw runner record; those remain subject to per-race raw snapshot inspection.
+
+Artifact ZIP digest: `sha256:5ff813cbcbb39b478f982c7609c22533acf9fb397ab0fa48932916515877371e`.
