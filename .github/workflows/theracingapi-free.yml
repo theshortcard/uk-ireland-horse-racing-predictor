@@ -31,7 +31,8 @@ jobs:
           snapshot="$(find data/external/theracingapi -maxdepth 1 -type f -name 'racecards_*.json' | head -n 1)"
           test -n "$snapshot"
           python -m src.audit_free_racecard "$snapshot" --output "reports/free-racecard-audit-${{ inputs.day }}.json"
-      - name: Upload snapshot and audit report
+      - name: Upload snapshot and audit report (even if audit fails)
+        if: always()
         uses: actions/upload-artifact@v6
         with:
           name: theracingapi-free-racecard-${{ inputs.day }}
