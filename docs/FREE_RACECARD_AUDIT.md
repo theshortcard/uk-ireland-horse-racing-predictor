@@ -191,3 +191,26 @@ The 38-race total and course counts match the detailed Racing Post listing and a
 This validates a further date with both GB and Irish coverage at the meeting-count level. It does not independently verify the six reserve classifications or every raw runner record; those remain subject to per-race raw snapshot inspection.
 
 Artifact ZIP digest: `sha256:5ff813cbcbb39b478f982c7609c22533acf9fb397ab0fa48932916515877371e`.
+
+
+## Saturday 28 November 2026 — successful audit after transient response-format failures
+
+Workflow run `45937163995` completed successfully on commit `a0e652f4e14c38a09816c20ca10532269cefc62f`. Artifact ID `15170798540`; snapshot retrieved at `2026-11-27T03:58:09Z`. The fetch, audit, and artifact-upload steps all completed successfully.
+
+The audit report records:
+
+- **45 race records** dated 28 November 2026: **37 GB** and **8 IRE**
+- Six courses: Bangor-on-Dee (7), Doncaster (7), Fairyhouse (8), Newbury (7), Newcastle (7), and Southwell (AW) (9)
+- All 45 races marked declared; 45 unique race IDs; no missing IDs, duplicate IDs, or duplicate course/off-time keys
+- **456 runner objects**, including **3 classified as reserves** by the current runner-number rule; 453 declared runner objects
+- Advertised field sizes sum to **453**, with no field-size/declared-runner mismatches
+- No empty runner arrays or duplicate runner names
+- Provider total 45, limit 500, skip 0
+
+### Independent race-count comparison
+
+Racing Post's dated 28 November racecard independently lists the same six UK and Irish meetings and the same course-level race counts: Newbury 7, Newcastle 7, Fairyhouse 8, Bangor-on-Dee 7, Doncaster 7, and Southwell 9 — **45 races total**. HorseRacingBot also reports six meetings and 45 races. BBC Sport's calendar independently confirms the same six meetings. This resolves the date-level race-count check for this snapshot.
+
+The two earlier workflow attempts (runs `45936945988` and `45936989718`) failed because the response being audited did not contain the expected `racecards` list. This successful capture did contain a valid structure and passed the full audit. The available evidence shows the earlier failure was not persistent; its precise cause is not established. The workflow was also changed so that the raw snapshot is uploaded even if a future audit fails, preserving evidence for diagnosis.
+
+The three reserve classifications still need direct per-runner inspection before being treated as independently confirmed. This snapshot is a strong positive coverage and structural-integrity check, not final approval for automatic predictor ingestion. Continue free-tier, date-by-date validation; do not add odds or EV claims to this feed.
