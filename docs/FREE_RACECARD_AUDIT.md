@@ -214,3 +214,37 @@ Racing Post's dated 28 November racecard independently lists the same six UK and
 The two earlier workflow attempts (runs `45936945988` and `45936989718`) failed because the response being audited did not contain the expected `racecards` list. This successful capture did contain a valid structure and passed the full audit. The available evidence shows the earlier failure was not persistent; its precise cause is not established. The workflow was also changed so that the raw snapshot is uploaded even if a future audit fails, preserving evidence for diagnosis.
 
 The three reserve classifications still need direct per-runner inspection before being treated as independently confirmed. This snapshot is a strong positive coverage and structural-integrity check, not final approval for automatic predictor ingestion. Continue free-tier, date-by-date validation; do not add odds or EV claims to this feed.
+
+
+## Sunday 29 November 2026 — final planned broad coverage sample
+
+Workflow run `46105203652` completed successfully on commit `5ce1f7a97e4e1071539928e7a08005f5fbffd70b`. Artifact ID `15247186961`; the raw snapshot was retrieved at `2026-11-28T03:56:38Z`. Fetch, audit, and artifact-upload steps all completed successfully.
+
+The audit summary reports:
+
+- **28 race records** dated 29 November 2026: **20 GB** and **8 IRE**
+- Four courses: Carlisle (7), Fairyhouse (8), Ffos Las (7), and Leicester (6)
+- All 28 race IDs unique; no missing IDs, duplicate IDs, or duplicate course/off-time keys
+- Race statuses: **22 declared** and **6 abandoned** (all six Leicester races)
+- **284 runner objects**; no records classified as reserves by the current rule
+- Advertised field sizes sum to **283**
+- No empty runner arrays or duplicate runner names
+- Provider total 28, limit 500, skip 0
+
+### Independent race-count comparison — matched
+
+Racing Post's dated Sunday 29 November card lists Fairyhouse 8, Carlisle 7, Ffos Las 7, and Leicester 6 (abandoned), matching the API's four course counts and **28 total race records**. Stablebet independently reports four meetings and 28 races. The Leicester records are retained in the raw feed but marked abandoned; they must not be treated as active races by a predictor.
+
+Sources checked: Racing Post dated racecards, Stablebet dated racecards, Racecards.uk, and Betfred's dated racecard listing. The source pages agree on the meeting/race counts and Leicester abandonment.
+
+### One runner-count mismatch remains — Carlisle 14:43
+
+The audit flags Carlisle at 14:43: advertised `field_size=10`, but the snapshot contains 11 runner objects. The independent published cards checked show 10 runners for that race. The extra object is consistent with a non-runner or other inactive runner record retained in the provider payload, but the current summary does not expose enough per-runner detail to confirm its status. It is **not** classified as a reserve by the current rule.
+
+The total advertised field size is 283 versus 284 raw runner objects, so this one-runner difference accounts for the overall one-record mismatch. Keep this as an explicit runner-status issue to resolve before automatic runner selection; do not silently discard the extra object.
+
+### Conclusion after Sunday
+
+This is a successful final planned broad coverage sample: UK and Irish course counts match independent published cards, including the six abandoned Leicester races being represented with abandoned status. The repeated snapshots now cover multiple dates and multiple Irish meetings. There is no evidence from these samples of systematic missing race meetings or a race-count problem in the free feed.
+
+The broad racecard coverage phase can therefore be considered complete. **One targeted data-quality task remains:** inspect the Carlisle 14:43 extra runner object and verify how the provider marks non-runners/reserves in raw records. After that, we can decide whether the feed is safe for a controlled predictor input pipeline. Keep the free tier; no paid subscription is justified by these findings. The endpoint still supplies racecards only, not odds or expected value.
