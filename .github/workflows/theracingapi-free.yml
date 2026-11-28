@@ -28,7 +28,7 @@ jobs:
           python -m src.fetch_racecards_api --day "${{ inputs.day }}" --output-dir data/external/theracingapi
       - name: Audit the saved racecard snapshot
         run: |
-          snapshot="$(find data/external/theracingapi -maxdepth 1 -type f -name 'racecards_*.json' | head -n 1)"
+          snapshot="$(find data/external/theracingapi -maxdepth 1 -type f -name 'racecards_*.json' ! -name '*.meta.json' | sort | tail -n 1)"
           test -n "$snapshot"
           python -m src.audit_free_racecard "$snapshot" --output "reports/free-racecard-audit-${{ inputs.day }}.json"
           echo "SNAPSHOT=$snapshot" >> "$GITHUB_ENV"
