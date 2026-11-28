@@ -41,7 +41,10 @@
 - [ ] Secure a permitted UK racecard and results feed
 - [ ] Secure a permitted Irish racecard and results feed
 - [ ] Automate source metadata and collection timestamps
-- [ ] Add non-runner and late-change handling
+- [x] Validate The Racing API free UK/IRE racecard coverage across multiple dates and reconcile sampled meeting counts
+- [x] Add conservative one-day racecard adapter with declared-race filtering and NR/reserve exclusion
+- [ ] Confirm provider retention and historical model-training permissions in writing
+- [ ] Add non-runner and late-change handling beyond the explicit NR/N/R and reserve markers handled by the current adapter
 - [ ] Build a prospective historical archive
 
 ## Phase 4 — modelling
