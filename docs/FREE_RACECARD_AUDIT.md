@@ -248,3 +248,25 @@ The total advertised field size is 283 versus 284 raw runner objects, so this on
 This is a successful final planned broad coverage sample: UK and Irish course counts match independent published cards, including the six abandoned Leicester races being represented with abandoned status. The repeated snapshots now cover multiple dates and multiple Irish meetings. There is no evidence from these samples of systematic missing race meetings or a race-count problem in the free feed.
 
 The broad racecard coverage phase can therefore be considered complete. **One targeted data-quality task remains:** inspect the Carlisle 14:43 extra runner object and verify how the provider marks non-runners/reserves in raw records. After that, we can decide whether the feed is safe for a controlled predictor input pipeline. Keep the free tier; no paid subscription is justified by these findings. The endpoint still supplies racecards only, not odds or expected value.
+
+
+### Carlisle 14:43 runner discrepancy — resolved by raw record and independent status sources
+
+The raw Sunday snapshot was downloaded and inspected directly. The Carlisle 14:43 race contains 11 runner objects, but the extra object is:
+
+- Horse: **Uncle Al**
+- Provider runner number: **`NR`**
+- Jockey field: blank
+- Advertised race `field_size`: 10
+
+Independent same-date sources corroborate the status: IrishRacing explicitly labels Uncle Al **Non Runner**, and betHQ lists him as **Scratched**. RaceCards.co.uk also displays him with runner number 0 and unknown jockey. Some other racecard summaries still displayed him in the list, demonstrating why runner status must be checked rather than inferred from simple object counts.
+
+The difference is therefore explained: **10 active runners plus one non-runner record = 11 raw runner objects**. The provider's field size of 10 is consistent with the active field. This is not a missing or extra active runner.
+
+### Audit logic improvement — explicit non-runner classification
+
+The offline audit previously excluded reserve entries whose runner number begins with `R`, but it did not separately exclude explicit non-runner number markers such as `NR` or `N/R`. The Carlisle example exposed that limitation.
+
+The audit now reports non-runner objects separately and compares advertised field size against runner objects after excluding both reserves and explicit non-runners. A regression test uses the actual Carlisle pattern (10 numbered runners plus Uncle Al marked `NR`) and confirms that the active count reconciles to 10. The change is in commit `eed134bf381e578ea8e332391cb7af430ffa705c`; the new test is in commit `c34b76ec082d6e5aaf082486df25aab0bc362ac4`.
+
+The updated automated test workflow still needs to be run on GitHub Actions. Until that workflow is green, treat the code change as committed but not yet test-verified. Once it passes, the broad feed coverage and this targeted runner-count discrepancy will have completed their planned validation. Continue using the free tier.
