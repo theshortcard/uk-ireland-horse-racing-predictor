@@ -13,6 +13,11 @@ def main() -> int:
     parser.add_argument("--input", default="data/sample_racecard.csv", help="Path to racecard CSV")
     parser.add_argument("--output", default="reports/daily_report.md", help="Path for Markdown report")
     parser.add_argument("--allow-blocked-provenance", action="store_true", help="Allow report generation to finish when provenance is blocked; market edge and EV remain suppressed")
+    parser.add_argument(
+        "--allow-validation-warnings",
+        action="store_true",
+        help="Generate the report despite visible structural/feature warnings; warnings remain in the report.",
+    )
     args = parser.parse_args()
 
     rows = read_racecard(args.input)
@@ -24,6 +29,10 @@ def main() -> int:
 
     if validation_issues:
         print(f"Completed with {len(validation_issues)} structural validation warning(s).")
+        if not args.allow_validation_warnings:
+            print("Report was written, but the command is blocked because validation warnings were not explicitly allowed.")
+            return 1
+        print("Continuing because --allow-validation-warnings was explicitly supplied; warnings remain visible in the report.")
     else:
         print("Structural validation passed.")
 
@@ -35,12 +44,12 @@ def main() -> int:
     else:
         print("Price provenance checks passed. Market comparisons may be shown only for complete priced fields.")
 
-    if validation_issues:
-        return 1
     if provenance_issues:
-        print("Demo report generated; provenance remains blocked and market edge/EV remain suppressed.")
-        return 0
-    print("Completed with no structural or provenance issues.")
+        print("Report generated; provenance remains blocked and market edge/EV remain suppressed.")
+    elif validation_issues:
+        print("Report generated with visible data-quality warnings; missing model features use documented neutral fallbacks.")
+    else:
+        print("Completed with no structural or provenance issues.")
     return 0
 
 
