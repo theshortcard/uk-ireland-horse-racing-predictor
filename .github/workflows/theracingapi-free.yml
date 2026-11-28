@@ -31,7 +31,21 @@ jobs:
           snapshot="$(find data/external/theracingapi -maxdepth 1 -type f -name 'racecards_*.json' | head -n 1)"
           test -n "$snapshot"
           python -m src.audit_free_racecard "$snapshot" --output "reports/free-racecard-audit-${{ inputs.day }}.json"
-      - name: Upload snapshot and audit report (even if audit fails)
+          echo "SNAPSHOT=$snapshot" >> "$GITHUB_ENV"
+          echo "METADATA=${snapshot%.json}.meta.json" >> "$GITHUB_ENV"
+      - name: Convert declared runners to predictor CSV
+        run: |
+          python -m src.import_theracingapi_racecards \
+            --snapshot "$SNAPSHOT" \
+            --metadata "$METADATA" \
+            --output "reports/free-racecard-${{ inputs.day }}.csv"
+      - name: Generate experimental baseline prediction report
+        run: |
+          python -m src.run \
+            --input "reports/free-racecard-${{ inputs.day }}.csv" \
+            --output "reports/free-racecard-predictions-${{ inputs.day }}.md" \
+            --allow-validation-warnings
+      - name: Upload snapshot, audit, and prediction report
         if: always()
         uses: actions/upload-artifact@v6
         with:
@@ -39,5 +53,7 @@ jobs:
           path: |
             data/external/theracingapi/*
             reports/free-racecard-audit-${{ inputs.day }}.json
+            reports/free-racecard-${{ inputs.day }}.csv
+            reports/free-racecard-predictions-${{ inputs.day }}.md
           if-no-files-found: error
           retention-days: 1
