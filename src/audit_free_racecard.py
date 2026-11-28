@@ -34,6 +34,7 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
     runner_objects = 0
     reserve_runner_objects = 0
+    non_runner_objects = 0
     declared_runner_objects = 0
     empty_runner_races = 0
     field_size_sum = 0
@@ -46,14 +47,23 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(runners, list):
             runners = []
         runner_objects += len(runners)
+
         reserves = [
             runner for runner in runners
             if isinstance(runner, dict)
             and str(runner.get("number", "")).strip().upper().startswith("R")
         ]
-        active_runners = [runner for runner in runners if runner not in reserves]
+        non_runners = [
+            runner for runner in runners
+            if isinstance(runner, dict)
+            and str(runner.get("number", "")).strip().upper() in {"NR", "N/R"}
+        ]
+        excluded = reserves + [runner for runner in non_runners if runner not in reserves]
+        active_runners = [runner for runner in runners if runner not in excluded]
+
         reserve_runner_objects += len(reserves)
-        declared_runner_objects += len(active_runners)
+        non_runner_objects += len(non_runners)
+        declared_runner_objects += len(runners) - len(reserves)
         if not runners:
             empty_runner_races += 1
 
@@ -71,8 +81,10 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
                     "date": race.get("date"),
                     "off_time": race.get("off_time"),
                     "field_size": field_size,
-                    "declared_runner_objects": len(active_runners),
-                    "all_runner_objects_including_reserves": len(runners),
+                    "active_runner_objects_excluding_reserves_and_non_runners": len(active_runners),
+                    "all_runner_objects": len(runners),
+                    "reserve_runner_objects": len(reserves),
+                    "non_runner_objects": len(non_runners),
                 })
 
         names = [str(x.get("horse", "")).strip().casefold()
@@ -101,6 +113,10 @@ def audit_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "runner_objects": runner_objects,
         "declared_runner_objects_excluding_reserves": declared_runner_objects,
         "reserve_runner_objects": reserve_runner_objects,
+        "non_runner_objects": non_runner_objects,
+        "active_runner_objects_excluding_reserves_and_non_runners": (
+            runner_objects - reserve_runner_objects - non_runner_objects
+        ),
         "empty_runner_races": empty_runner_races,
         "field_size_sum": field_size_sum,
         "field_size_known_races": field_size_known,
