@@ -106,3 +106,23 @@ See [development roadmap](docs/ROADMAP.md) for the remaining work: permitted fre
 The repository includes a guarded, manual-only connector for The Racing API's free `/v1/racecards/free` endpoint. It uses HTTP Basic Authentication from the GitHub Actions secrets `RACING_API_USERNAME` and `RACING_API_PASSWORD`, requests GB and IRE regions, and fetches only one selected day (today or tomorrow) per run. The free endpoint is basic racecard data and does not supply runner odds; it must not be used for market edge or EV calculations.
 
 To test it, open **Actions → The Racing API free racecard test → Run workflow**, choose today or tomorrow, and run. The workflow uploads the raw JSON snapshot and a credential-free metadata file as a private workflow artifact with a one-day retention period. The snapshot is ignored by Git and is not imported into the model. Inspect the artifact before any mapping is written. The endpoint is limited to one request per second on the Free plan; run only one workflow at a time. Long-term retention or historical model-training use remains subject to written confirmation from the provider.
+
+
+### Convert a free-tier snapshot into a one-day prediction card
+
+A conservative adapter is available at `src/import_theracingapi_racecards.py`. It reads the raw JSON snapshot and its matching credential-free metadata sidecar, includes only declared GB/IRE races, excludes runner numbers marked `NR`/`N/R` and reserve numbers beginning with `R`, converts the timezone-aware `off_dt` into UK local race time, and leaves every odds field blank.
+
+Example:
+
+```bash
+python -m src.import_theracingapi_racecards \
+  --snapshot data/external/theracingapi/racecards_tomorrow_YYYYMMDDTHHMMSSZ.json \
+  --metadata data/external/theracingapi/racecards_tomorrow_YYYYMMDDTHHMMSSZ.meta.json \
+  --output reports/free_racecard.csv
+
+python -m src.run --input reports/free_racecard.csv --output reports/free_racecard_predictions.md
+```
+
+Replace the timestamped filenames with the matching files from the same fetch. The adapter refuses ambiguous race times or missing/naive retrieval timestamps. With no bookmaker odds, the report can show experimental model rankings/fair odds only; market probabilities, edge and EV remain unavailable. The current baseline is not trained or calibrated.
+
+**Rights and retention caution:** coverage validation is complete for the sampled dates, but provider permission for long-term retention and historical training use still needs written confirmation. Do not build a permanent archive or train on retained snapshots until that is clarified. Keep raw snapshots out of Git.
