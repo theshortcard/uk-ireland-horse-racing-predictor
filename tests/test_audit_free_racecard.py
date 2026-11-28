@@ -31,7 +31,9 @@ def test_audit_counts_races_regions_and_runner_mismatches():
     assert report["empty_runner_races"] == 1
     assert report["field_size_sum"] == 7
     assert report["field_size_runner_object_mismatches"][0]["field_size"] == 7
-    assert report["field_size_runner_object_mismatches"][0]["declared_runner_objects"] == 2
+    assert report["field_size_runner_object_mismatches"][0][
+        "active_runner_objects_excluding_reserves_and_non_runners"
+    ] == 2
 
 
 def test_audit_flags_duplicate_race_identity_and_course_time():
@@ -57,7 +59,6 @@ def test_audit_rejects_missing_racecards_list():
         raise AssertionError("Expected ValueError")
 
 
-
 def test_audit_parses_provider_field_size_strings():
     payload = {
         "racecards": [{
@@ -73,10 +74,12 @@ def test_audit_parses_provider_field_size_strings():
     assert report["field_size_known_races"] == 1
     assert report["field_size_runner_object_mismatches"] == [{
         "course": "Dundalk", "date": "2026-11-25", "off_time": "2:31",
-        "field_size": 14, "declared_runner_objects": 15,
-        "all_runner_objects_including_reserves": 15,
+        "field_size": 14,
+        "active_runner_objects_excluding_reserves_and_non_runners": 15,
+        "all_runner_objects": 15,
+        "reserve_runner_objects": 0,
+        "non_runner_objects": 0,
     }]
-
 
 
 def test_audit_excludes_reserve_entries_from_declared_field_comparison():
@@ -96,4 +99,28 @@ def test_audit_excludes_reserve_entries_from_declared_field_comparison():
     assert report["runner_objects"] == 15
     assert report["declared_runner_objects_excluding_reserves"] == 14
     assert report["reserve_runner_objects"] == 1
+    assert report["non_runner_objects"] == 0
+    assert report["active_runner_objects_excluding_reserves_and_non_runners"] == 14
+    assert report["field_size_runner_object_mismatches"] == []
+
+
+def test_audit_excludes_nr_entries_from_active_field_size():
+    payload = {
+        "racecards": [{
+            "race_id": "carlisle-1443", "date": "2026-11-29", "course": "Carlisle",
+            "off_time": "2:43", "region": "gb", "race_status": "declared",
+            "field_size": "10",
+            "runners": (
+                [{"number": str(i), "horse": f"Horse {i}"} for i in range(1, 11)]
+                + [{"number": "NR", "horse": "Uncle Al", "jockey": ""}]
+            ),
+        }]
+    }
+    report = audit_payload(payload)
+
+    assert report["runner_objects"] == 11
+    assert report["declared_runner_objects_excluding_reserves"] == 11
+    assert report["reserve_runner_objects"] == 0
+    assert report["non_runner_objects"] == 1
+    assert report["active_runner_objects_excluding_reserves_and_non_runners"] == 10
     assert report["field_size_runner_object_mismatches"] == []
